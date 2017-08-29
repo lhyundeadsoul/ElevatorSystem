@@ -11,12 +11,16 @@ public class Task {
     private Direction direction;
 
     private Status status;
+    public Task(Floor floor) {
+        this.floor = floor;
+        this.status = Status.RUNNABLE;
+    }
+
     public Task(Floor floor, Direction direction) {
         this.floor = floor;
         this.direction = direction;
         this.status = Status.RUNNABLE;
     }
-
     public static Task generate(Floor floor, Direction direction) {
         return new Task(floor, direction);
     }
@@ -34,5 +38,21 @@ public class Task {
                 return false;
             }
         }
+    }
+
+    public static Task generate(Floor floor) {
+        return new Task(floor);
+    }
+
+    public Floor getFloor() {
+        return floor;
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public Status getStatus() {
+        return status;
     }
 }

@@ -6,15 +6,18 @@ public class User {
 
 
     private String name;
-    private Floor floor;
+    /**
+     * 当前正在乘坐的电梯
+     */
+    private Elevator elevator;
+    /**
+     * 目标楼层
+     */
+    private Floor targetFloor;
 
-    public User(String name, Floor floor) {
+    public User(String name, Floor targetFloor) {
         this.name = name;
-        this.floor = floor;
-    }
-
-    public Task use(Direction direction){
-        return Task.generate(getFloor(), direction);
+        this.targetFloor = targetFloor;
     }
 
     public boolean cancel(Task task){
@@ -22,7 +25,8 @@ public class User {
     }
 
     public boolean select(Floor floor){
-        //todo
+        Task task = Task.generate(floor);
+        elevator.receive(task);
         return false;
     }
 
@@ -30,15 +34,7 @@ public class User {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Floor getFloor() {
-        return floor;
-    }
-
-    public void setFloor(Floor floor) {
-        this.floor = floor;
+    public Floor getTargetFloor() {
+        return targetFloor;
     }
 }
