@@ -1,6 +1,6 @@
 package biz.jared.domain.enumeration;
 
-public enum Status {
+public enum TaskStatus {
     RUNNABLE,
     RUNNING,
     CANCELLED

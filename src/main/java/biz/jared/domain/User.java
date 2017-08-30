@@ -30,6 +30,14 @@ public class User {
         elevator.receive(task);
     }
 
+    public Elevator getElevator() {
+        return elevator;
+    }
+
+    public void setElevator(Elevator elevator) {
+        this.elevator = elevator;
+    }
+
     Floor getTargetFloor() {
         return targetFloor;
     }

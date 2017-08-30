@@ -1,12 +1,15 @@
 package biz.jared.domain;
 
 import biz.jared.domain.enumeration.Direction;
-import biz.jared.domain.enumeration.Status;
+import biz.jared.domain.enumeration.TaskStatus;
+
+import java.util.Random;
 
 /**
  * @author jared
  */
 public class Task {
+    private int id;
     /**
      * 产生此task的源楼层
      */
@@ -16,21 +19,36 @@ public class Task {
      */
     private Direction direction;
 
-    private Status status;
+    private TaskStatus status;
 
-    public Task(Floor floor) {
+    public Task(int id, Floor floor) {
+        this.id = id;
         this.floor = floor;
-        this.status = Status.RUNNABLE;
+        this.status = TaskStatus.RUNNABLE;
     }
 
-    public Task(Floor floor, Direction direction) {
-        this.floor = floor;
+    public Task(int id, Floor floor, Direction direction) {
+        this(id, floor);
         this.direction = direction;
-        this.status = Status.RUNNABLE;
     }
 
+    /**
+     * 楼层产生任务
+     * @param floor
+     * @param direction
+     * @return
+     */
     public static Task generate(Floor floor, Direction direction) {
-        return new Task(floor, direction);
+        return new Task(new Random().nextInt(10000), floor, direction);
+    }
+
+    /**
+     * 用户产生任务
+     * @param floor
+     * @return
+     */
+    public static Task generate(Floor floor) {
+        return new Task(new Random().nextInt(10000), floor);
     }
 
     /**
@@ -40,17 +58,14 @@ public class Task {
      */
     public boolean cancel() {
         synchronized (status) {
-            if (!Status.RUNNING.equals(status)) {
-                status = Status.CANCELLED;
+            if (!TaskStatus.RUNNING.equals(status)) {
+                status = TaskStatus.CANCELLED;
+                System.out.println(this + " cancelled");
                 return true;
             } else {
                 return false;
             }
         }
-    }
-
-    public static Task generate(Floor floor) {
-        return new Task(floor);
     }
 
     public Floor getFloor() {
@@ -61,7 +76,16 @@ public class Task {
         return direction;
     }
 
-    public Status getStatus() {
+    public TaskStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id=" + id +
+                ", floor=" + floor.getFloorNo() +
+                ", direction=" + direction +
+                '}';
     }
 }

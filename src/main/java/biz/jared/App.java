@@ -8,7 +8,7 @@ import biz.jared.domain.Dispatcher;
 import biz.jared.domain.Elevator;
 import biz.jared.domain.Floor;
 import biz.jared.domain.User;
-import biz.jared.strategy.DefaultStrategy;
+import biz.jared.strategy.RandomDispatchStrategy;
 
 /**
  * Hello world!
@@ -24,6 +24,10 @@ public class App {
         for (int i = 0; i < FLOOR_NUM; i++) {
             Floor floor = new Floor(i + 1);
             floorList.add(floor);
+            if(i>0) {
+                floor.preFloor(floorList.get(i - 1));
+                floorList.get(i - 1).next(floorList.get(i - 1));
+            }
         }
 
         //generate all elevator
@@ -33,7 +37,10 @@ public class App {
         elevatorList.add(new Elevator(2, floorList.get(9)));
 
         //generate dispatcher
-        Dispatcher dispatcher = new Dispatcher(elevatorList, new DefaultStrategy());
+        Dispatcher dispatcher = new Dispatcher(elevatorList, new RandomDispatchStrategy());
+
+        //elevator set dispatcher
+        elevatorList.forEach(elevator -> elevator.setDispatcher(dispatcher));
 
         //floor set dispatcher
         floorList.forEach(floor -> floor.setDispatcher(dispatcher));

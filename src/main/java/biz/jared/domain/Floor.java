@@ -36,11 +36,17 @@ public class Floor {
         return floorNo;
     }
 
-    public Floor getNextFloor(Direction direction) {
+    public Floor next(Direction direction) {
         return Direction.UP.equals(direction) ? nextFloor : preFloor;
     }
 
-    public void setPreFloor(Floor preFloor) {
+    public Floor next(Floor nextFloor) {
+        this.nextFloor = nextFloor;
+        nextFloor.preFloor(this);
+        return nextFloor;
+    }
+
+    public void preFloor(Floor preFloor) {
         this.preFloor = preFloor;
     }
 
@@ -71,11 +77,11 @@ public class Floor {
         if (num >= waitingUserSet.size()) {
             reduceSet = waitingUserSet;
         } else {
-            reduceSet = new HashSet<User>(num);
+            reduceSet = new HashSet<>(num);
             Iterator<User> iterator = waitingUserSet.iterator();
-            for (int i = 0; i < num; i++) {
+            while (reduceSet.size() < num) {
                 User next = iterator.next();
-                waitingUserSet.remove(next);
+                iterator.remove();
                 reduceSet.add(next);
             }
         }
@@ -97,14 +103,8 @@ public class Floor {
     @Override
     public String toString() {
         return "Floor{" +
-            "floorNo=" + floorNo +
-            '}';
-    }
-
-    public Floor next(Floor nextFloor) {
-        this.nextFloor = nextFloor;
-        nextFloor.setPreFloor(this);
-        return nextFloor;
+                "floorNo=" + floorNo +
+                '}';
     }
 
     public void setDispatcher(Dispatcher dispatcher) {
@@ -113,10 +113,14 @@ public class Floor {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-        Floor floor = (Floor)o;
+        Floor floor = (Floor) o;
 
         return floorNo == floor.floorNo;
     }
