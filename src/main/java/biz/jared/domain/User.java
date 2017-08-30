@@ -1,5 +1,8 @@
 package biz.jared.domain;
 
+/**
+ * @author jared
+ */
 public class User {
 
     private String name;

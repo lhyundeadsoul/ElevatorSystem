@@ -38,6 +38,9 @@ public class App {
         //floor set dispatcher
         floorList.forEach(floor -> floor.setDispatcher(dispatcher));
 
+        //elevator run
+        elevatorList.forEach(elevator -> new Thread(elevator, "elevator-thread-" + elevator.getId()).start());
+
         //generate all user
         Random random = new Random();
         for (int i = 0; i < USER_NUM; i++) {
