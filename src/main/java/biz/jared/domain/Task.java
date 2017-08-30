@@ -7,10 +7,17 @@ import biz.jared.domain.enumeration.Status;
  * @author jared
  */
 public class Task {
+    /**
+     * 产生此task的源楼层
+     */
     private Floor floor;
+    /**
+     * 这是一个想去什么方向的task？
+     */
     private Direction direction;
 
     private Status status;
+
     public Task(Floor floor) {
         this.floor = floor;
         this.status = Status.RUNNABLE;
@@ -27,7 +34,7 @@ public class Task {
 
     /**
      * 只要不是running状态即可取消
-     * @return
+     * @return 取消成功与否，成功取消 true
      */
     public boolean cancel() {
         synchronized (status){
