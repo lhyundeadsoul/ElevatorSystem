@@ -55,7 +55,7 @@ public class Floor {
         if (!waitingDirectionMap.containsKey(direction)) {
             Task task = Task.generate(this, direction);
             waitingDirectionMap.put(direction, task);
-            dispatcher.receive(task);
+            dispatcher.dispatch(task);
         }
     }
 

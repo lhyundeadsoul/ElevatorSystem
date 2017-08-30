@@ -158,4 +158,8 @@ public class Elevator implements Runnable {
             ", currLoad=" + currLoad.size() +
             '}';
     }
+
+    public int getId() {
+        return id;
+    }
 }

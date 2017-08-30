@@ -34,7 +34,7 @@ public class Task {
     }
 
     /**
-     * 只要不是running状态即可取消
+     * 只要不是running状态即可改为取消状态，取消状态的task不会被执行
      *
      * @return 取消成功与否，成功取消 true
      */

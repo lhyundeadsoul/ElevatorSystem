@@ -31,7 +31,7 @@ public class Dispatcher {
         this.dispatchStrategy = dispatchStrategy;
     }
 
-    void receive(Task task) {
+    void dispatch(Task task) {
 
     }
 
@@ -40,7 +40,7 @@ public class Dispatcher {
     }
 
     public void redispatch(Task task) {
-        receive(task);
+        dispatch(task);
     }
 
 }
