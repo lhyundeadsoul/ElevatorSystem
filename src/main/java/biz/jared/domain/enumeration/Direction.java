@@ -13,5 +13,6 @@ public enum Direction {
             return UP;
         }
     };
+
     public abstract Direction opposite();
 }

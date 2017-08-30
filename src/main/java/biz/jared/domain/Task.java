@@ -28,16 +28,18 @@ public class Task {
         this.direction = direction;
         this.status = Status.RUNNABLE;
     }
+
     public static Task generate(Floor floor, Direction direction) {
         return new Task(floor, direction);
     }
 
     /**
      * 只要不是running状态即可取消
+     *
      * @return 取消成功与否，成功取消 true
      */
     public boolean cancel() {
-        synchronized (status){
+        synchronized (status) {
             if (!Status.RUNNING.equals(status)) {
                 status = Status.CANCELLED;
                 return true;

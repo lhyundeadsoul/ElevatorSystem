@@ -1,17 +1,17 @@
 package biz.jared.domain;
 
-import biz.jared.Calc;
-import biz.jared.domain.enumeration.Direction;
-import biz.jared.domain.enumeration.Status;
-import biz.jared.exception.CannotExecTaskException;
-import biz.jared.exception.TaskCancelledException;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import biz.jared.Calc;
+import biz.jared.domain.enumeration.Direction;
+import biz.jared.domain.enumeration.Status;
+import biz.jared.exception.CannotExecTaskException;
+import biz.jared.exception.TaskCancelledException;
 
 /**
  * @author jared

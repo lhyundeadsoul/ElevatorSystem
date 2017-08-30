@@ -1,13 +1,12 @@
 package biz.jared.domain;
 
-import biz.jared.domain.enumeration.Direction;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
+
+import biz.jared.domain.enumeration.Direction;
 
 /**
  * @author jared
@@ -15,7 +14,7 @@ import java.util.concurrent.Executors;
 public class Floor {
 
     private int floorNo;
-    private Floor preFloor,nextFloor;
+    private Floor preFloor, nextFloor;
     /**
      * 当前楼层等候人群
      */
@@ -47,24 +46,26 @@ public class Floor {
 
     /**
      * 楼层又来了人
+     *
      * @param user
      */
-    public void add(User user, Direction direction){
+    public void add(User user, Direction direction) {
         waitingUserSet.add(user);
         //只有之前没人说要去的方向才可以建任务，已经有人说要去的方向就不用再说一次了
         if (!waitingDirectionMap.containsKey(direction)) {
             Task task = Task.generate(this, direction);
-            waitingDirectionMap.put(direction,task);
+            waitingDirectionMap.put(direction, task);
             dispatcher.receive(task);
         }
     }
 
     /**
      * 楼层可以减少num人
+     *
      * @param num 可以减少的人数
      * @return 减少的人集合
      */
-    public Set<User> reduce(int num){
+    public Set<User> reduce(int num) {
         Set<User> reduceSet;
         //电梯剩余负载大于所有等候人数的情况，全上。否则只上随机的一部分
         if (num >= waitingUserSet.size()) {
@@ -83,9 +84,10 @@ public class Floor {
 
     /**
      * 取消某方向上的任务
+     *
      * @param direction
      */
-    public void cancel(Direction direction){
+    public void cancel(Direction direction) {
         if (waitingDirectionMap.containsKey(direction)) {
             dispatcher.cancel(waitingDirectionMap.get(direction));
             waitingDirectionMap.remove(direction);
@@ -95,8 +97,8 @@ public class Floor {
     @Override
     public String toString() {
         return "Floor{" +
-                "floorNo=" + floorNo +
-                '}';
+            "floorNo=" + floorNo +
+            '}';
     }
 
     public Floor next(Floor nextFloor) {

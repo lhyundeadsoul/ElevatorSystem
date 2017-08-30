@@ -1,15 +1,15 @@
 package biz.jared.domain;
 
-import biz.jared.strategy.Strategy;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import biz.jared.strategy.Strategy;
+
 /**
  * 多电梯系统的任务总调度器
+ *
  * @author jared
  */
 public class Dispatcher {

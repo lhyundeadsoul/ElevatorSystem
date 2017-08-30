@@ -1,9 +1,6 @@
 package biz.jared.domain;
 
-import biz.jared.domain.enumeration.Direction;
-
 public class User {
-
 
     private String name;
     /**
@@ -22,9 +19,10 @@ public class User {
 
     /**
      * 用户选择了一个楼层
+     *
      * @param floor 目标楼层
      */
-    void select(Floor floor){
+    void select(Floor floor) {
         Task task = Task.generate(floor);
         elevator.receive(task);
     }
