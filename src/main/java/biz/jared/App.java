@@ -3,6 +3,7 @@ package biz.jared;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import biz.jared.domain.Dispatcher;
 import biz.jared.domain.Elevator;
@@ -14,11 +15,11 @@ import biz.jared.strategy.RandomDispatchStrategy;
  * Hello world!
  */
 public class App {
-    private static final int FLOOR_NUM = 10;
-    private static final int ELEVATOR_NUM = 3;
-    private static final int USER_NUM = 100;
+    private static final int FLOOR_NUM = 5;
+    private static final int ELEVATOR_NUM = 2;
+    private static final int USER_NUM = 3;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         //generate all floor
         List<Floor> floorList = new ArrayList<>(FLOOR_NUM);
         for (int i = 0; i < FLOOR_NUM; i++) {
@@ -32,9 +33,9 @@ public class App {
 
         //generate all elevator
         List<Elevator> elevatorList = new ArrayList<>(ELEVATOR_NUM);
-        elevatorList.add(new Elevator(0, floorList.get(0)));
-        elevatorList.add(new Elevator(1, floorList.get(5)));
-        elevatorList.add(new Elevator(2, floorList.get(9)));
+        for (int i = 0; i < ELEVATOR_NUM; i++) {
+            elevatorList.add(new Elevator(i, floorList.get(0)));
+        }
 
         //generate dispatcher
         Dispatcher dispatcher = new Dispatcher(elevatorList, new RandomDispatchStrategy());
@@ -51,6 +52,7 @@ public class App {
         //generate all user
         Random random = new Random();
         for (int i = 0; i < USER_NUM; i++) {
+            TimeUnit.SECONDS.sleep(2);
             //站在什么楼层
             Floor srcFloor = floorList.get(random.nextInt(FLOOR_NUM));
             //想去什么楼层

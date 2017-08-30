@@ -199,7 +199,7 @@ public class Elevator implements Runnable {
     public String toString() {
         return "Elevator{" +
                 "id=" + id +
-                ", currFloor=" + currFloor +
+                ", currFloor=" + currFloor.getFloorNo() +
                 ", currLoad=" + currLoad.size() +
                 '}';
     }
