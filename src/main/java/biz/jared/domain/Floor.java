@@ -42,11 +42,11 @@ public class Floor {
 
     public Floor next(Floor nextFloor) {
         this.nextFloor = nextFloor;
-        nextFloor.preFloor(this);
+        nextFloor.previous(this);
         return nextFloor;
     }
 
-    public void preFloor(Floor preFloor) {
+    public void previous(Floor preFloor) {
         this.preFloor = preFloor;
     }
 

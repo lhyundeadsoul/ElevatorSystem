@@ -25,8 +25,8 @@ public class App {
         for (int i = 0; i < FLOOR_NUM; i++) {
             Floor floor = new Floor(i + 1);
             floorList.add(floor);
-            if(i>0) {
-                floor.preFloor(floorList.get(i - 1));
+            if (i > 0) {
+                floor.previous(floorList.get(i - 1));
                 floorList.get(i - 1).next(floorList.get(i - 1));
             }
         }
