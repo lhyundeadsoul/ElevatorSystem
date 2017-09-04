@@ -5,7 +5,7 @@ import biz.jared.strategy.DispatchStrategy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * 多电梯系统的任务总调度器
@@ -16,7 +16,7 @@ public class Dispatcher {
     /**
      * 电梯调度系统的任务列表
      */
-    private BlockingQueue<Task> taskQueue = new LinkedBlockingDeque<>();
+    private BlockingQueue<Task> taskQueue = new LinkedBlockingQueue<>();
     /**
      * 可以调度的电梯列表
      */
@@ -37,7 +37,7 @@ public class Dispatcher {
      * @param elevator
      */
     Task dispatch(Elevator elevator) {
-        Task task = dispatchStrategy.select(elevatorList, elevator, taskQueue);
+        Task task = dispatchStrategy.select(elevatorList, taskQueue);
         elevator.receive(task);
         return task;
     }

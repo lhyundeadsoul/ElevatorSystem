@@ -12,6 +12,12 @@ public enum Direction {
         public Direction opposite() {
             return UP;
         }
+    },
+    SAME {
+        @Override
+        public Direction opposite() {
+            return SAME;
+        }
     };
 
     public abstract Direction opposite();

@@ -16,8 +16,8 @@ import biz.jared.strategy.RandomDispatchStrategy;
  */
 public class App {
     private static final int FLOOR_NUM = 5;
-    private static final int ELEVATOR_NUM = 2;
-    private static final int USER_NUM = 3;
+    private static final int ELEVATOR_NUM = 1;
+    private static final int USER_NUM = 2;
 
     public static void main(String[] args) throws InterruptedException {
         //generate all floor
@@ -26,8 +26,7 @@ public class App {
             Floor floor = new Floor(i + 1);
             floorList.add(floor);
             if (i > 0) {
-                floor.previous(floorList.get(i - 1));
-                floorList.get(i - 1).next(floorList.get(i - 1));
+                floorList.get(i - 1).next(floor);
             }
         }
 
@@ -54,14 +53,29 @@ public class App {
         for (int i = 0; i < USER_NUM; i++) {
             TimeUnit.SECONDS.sleep(2);
             //站在什么楼层
-            Floor srcFloor = floorList.get(random.nextInt(FLOOR_NUM));
+            int randomSrcFloorNo = random.nextInt(FLOOR_NUM);
+            Floor srcFloor = floorList.get(randomSrcFloorNo);
             //想去什么楼层
-            Floor targetFloor = floorList.get(random.nextInt(FLOOR_NUM));
-
+            Floor targetFloor = floorList.get(differentFloorNo(randomSrcFloorNo));
             User user = new User("lucy" + i, targetFloor);
+            System.out.println("src_floorNo="+srcFloor.getFloorNo()+" "+user);
             //srcFloor.locate(targetFloor).opposite()，结果Direction一定是对的，但是这里也支持传错的，也符合实际
             srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
             //srcFloor.add(user, Direction.DOWN);
         }
+    }
+
+    /**
+     * 返回一下不一样的楼层
+     * @param randomSrcFloorNo
+     * @return
+     */
+    private static int differentFloorNo(int randomSrcFloorNo) {
+        Random random = new Random();
+        int result;
+        do {
+            result = random.nextInt(FLOOR_NUM);
+        } while (result == randomSrcFloorNo);
+        return result;
     }
 }

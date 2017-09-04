@@ -13,4 +13,5 @@ public class Calc {
     public static int calcDistance(Floor src, Floor target) {
         return src.getFloorNo() - target.getFloorNo();
     }
+
 }

@@ -8,12 +8,12 @@ import java.util.Random;
 /**
  * @author jared
  */
-public class Task {
+public class Task implements Comparable<Task>{
     private int id;
     /**
      * 产生此task的源楼层
      */
-    private Floor floor;
+    private Floor srcFloor;
     /**
      * 这是一个想去什么方向的task？
      */
@@ -21,14 +21,15 @@ public class Task {
 
     private TaskStatus status;
 
-    public Task(int id, Floor floor) {
+    private int priority;
+    private Task(int id, Floor srcFloor) {
         this.id = id;
-        this.floor = floor;
+        this.srcFloor = srcFloor;
         this.status = TaskStatus.RUNNABLE;
     }
 
-    public Task(int id, Floor floor, Direction direction) {
-        this(id, floor);
+    private Task(int id, Floor srcFloor, Direction direction) {
+        this(id, srcFloor);
         this.direction = direction;
     }
 
@@ -40,15 +41,6 @@ public class Task {
      */
     public static Task generate(Floor floor, Direction direction) {
         return new Task(new Random().nextInt(10000), floor, direction);
-    }
-
-    /**
-     * 用户产生任务
-     * @param floor
-     * @return
-     */
-    public static Task generate(Floor floor) {
-        return new Task(new Random().nextInt(10000), floor);
     }
 
     /**
@@ -68,24 +60,37 @@ public class Task {
         }
     }
 
-    public Floor getFloor() {
-        return floor;
-    }
-
-    public Direction getDirection() {
-        return direction;
+    public Floor getSrcFloor() {
+        return srcFloor;
     }
 
     public TaskStatus getStatus() {
         return status;
     }
 
+    public Direction getDirection() {
+        return direction;
+    }
+
     @Override
     public String toString() {
         return "Task{" +
                 "id=" + id +
-                ", floor=" + floor.getFloorNo() +
+                ", src floor=" + srcFloor.getFloorNo() +
                 ", direction=" + direction +
                 '}';
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    @Override
+    public int compareTo(Task o) {
+        return priority - o.priority;
     }
 }

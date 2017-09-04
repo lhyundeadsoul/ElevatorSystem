@@ -1,5 +1,7 @@
 package biz.jared.domain;
 
+import biz.jared.domain.enumeration.Direction;
+
 /**
  * @author jared
  */
@@ -23,18 +25,15 @@ public class User {
     /**
      * 用户选择了一个楼层
      *
-     * @param floor 目标楼层
+     * @param targetFloor 目标楼层
      */
-    void select(Floor floor) {
-        Task task = Task.generate(floor);
+    void select(Floor targetFloor) {
+        Task task = Task.generate(targetFloor, Direction.SAME);
+        System.out.println(this+" select " + targetFloor + " create "+ task);
         elevator.receive(task);
     }
 
-    public Elevator getElevator() {
-        return elevator;
-    }
-
-    public void setElevator(Elevator elevator) {
+    public void enterElevator(Elevator elevator) {
         this.elevator = elevator;
     }
 
@@ -45,8 +44,9 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-            "name='" + name + '\'' +
-            '}';
+                "name='" + name + '\'' +
+                ", targeFloor=" + targetFloor.getFloorNo() +
+                '}';
     }
 
     @Override
