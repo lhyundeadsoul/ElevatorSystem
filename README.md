@@ -13,5 +13,5 @@ a Multi-elevator System
 
 ## Legacy Problem
 - [x] 电梯来了，和用户方向不同，用户也不能上
-- [] dispatcher任务分配优先级还没排查
-- [] 电梯任务抢占
+- [ ] dispatcher任务分配优先级还没排查
+- [ ] 电梯任务抢占
