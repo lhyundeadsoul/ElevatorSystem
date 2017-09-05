@@ -89,6 +89,10 @@ public class Task implements Comparable<Task>{
         return priority;
     }
 
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+
     @Override
     public int compareTo(Task o) {
         return priority - o.priority;

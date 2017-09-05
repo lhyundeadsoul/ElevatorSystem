@@ -33,7 +33,7 @@ public class User {
         elevator.receive(task);
     }
 
-    public void enterElevator(Elevator elevator) {
+    void enterElevator(Elevator elevator) {
         this.elevator = elevator;
     }
 

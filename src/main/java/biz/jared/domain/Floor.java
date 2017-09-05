@@ -16,9 +16,13 @@ public class Floor {
     private int floorNo;
     private Floor preFloor, nextFloor;
     /**
-     * 当前楼层等候人群
+     * 当前楼层往上走的等候人群
      */
-    private Set<User> waitingUserSet = new HashSet<>(100);
+    private Set<User> waitingUpUserSet = new HashSet<>(100);
+    /**
+     * 当前楼层往下走的等候人群
+     */
+    private Set<User> waitingDownUserSet = new HashSet<>(100);
     /**
      * 已经有人表达说要去的方向集合
      */
@@ -36,7 +40,7 @@ public class Floor {
         return floorNo;
     }
 
-    public Floor next(Direction direction) {
+    Floor next(Direction direction) {
         return Direction.UP.equals(direction) ? nextFloor : preFloor;
     }
 
@@ -46,7 +50,7 @@ public class Floor {
         return nextFloor;
     }
 
-    public void previous(Floor preFloor) {
+    private void previous(Floor preFloor) {
         this.preFloor = preFloor;
     }
 
@@ -56,7 +60,11 @@ public class Floor {
      * @param user
      */
     public void add(User user, Direction direction) {
-        waitingUserSet.add(user);
+        if (direction.equals(Direction.UP)) {
+            waitingUpUserSet.add(user);
+        } else if (direction.equals(Direction.DOWN)) {
+            waitingDownUserSet.add(user);
+        }
         //只有之前没人说要去的方向才可以建任务，已经有人说要去的方向就不用再说一次了
         if (!waitingDirectionMap.containsKey(direction)) {
             Task task = Task.generate(this, direction);
@@ -68,11 +76,14 @@ public class Floor {
     /**
      * 楼层可以减少num人
      *
+     *
+     * @param direction 可以带走向哪个方向走的人
      * @param num 可以减少的人数
      * @return 减少的人集合
      */
-    public Set<User> reduce(int num) {
+    Set<User> reduce(Direction direction, int num) {
         Set<User> reduceSet;
+        Set<User> waitingUserSet = direction.equals(Direction.UP) ? waitingUpUserSet : waitingDownUserSet;
         //电梯剩余负载大于所有等候人数的情况，全上。否则只上随机的一部分
         if (num >= waitingUserSet.size()) {
             reduceSet = waitingUserSet;

@@ -9,10 +9,13 @@ import biz.jared.domain.Dispatcher;
 import biz.jared.domain.Elevator;
 import biz.jared.domain.Floor;
 import biz.jared.domain.User;
+import biz.jared.strategy.DispatchStrategy;
+import biz.jared.strategy.DistanceShortPriorityStrategy;
+import biz.jared.strategy.PriorityCalculationStrategy;
 import biz.jared.strategy.RandomDispatchStrategy;
 
 /**
- * Hello world!
+ * App Start
  */
 public class App {
     private static final int FLOOR_NUM = 5;
@@ -30,14 +33,20 @@ public class App {
             }
         }
 
+        //make priority strategy
+        PriorityCalculationStrategy priorityStrategy = new DistanceShortPriorityStrategy();
+
         //generate all elevator
         List<Elevator> elevatorList = new ArrayList<>(ELEVATOR_NUM);
         for (int i = 0; i < ELEVATOR_NUM; i++) {
-            elevatorList.add(new Elevator(i, floorList.get(0)));
+            elevatorList.add(new Elevator(i, floorList.get(0), priorityStrategy));
         }
 
+        //make dispatch strategy
+        DispatchStrategy dispatchStrategy = new RandomDispatchStrategy();
+
         //generate dispatcher
-        Dispatcher dispatcher = new Dispatcher(elevatorList, new RandomDispatchStrategy());
+        Dispatcher dispatcher = new Dispatcher(elevatorList, dispatchStrategy);
 
         //elevator set dispatcher
         elevatorList.forEach(elevator -> elevator.setDispatcher(dispatcher));
@@ -48,6 +57,13 @@ public class App {
         //elevator run
         elevatorList.forEach(elevator -> new Thread(elevator, "elevator-thread-" + elevator.getId()).start());
 
+        //simulation
+        simulation1u1e(floorList);
+        //simulationNu1e(floorList);
+        //randomSimulate(floorList);
+    }
+
+    private static void randomSimulate(List<Floor> floorList) throws InterruptedException {
         //generate all user
         Random random = new Random();
         for (int i = 0; i < USER_NUM; i++) {
@@ -64,6 +80,51 @@ public class App {
             //srcFloor.add(user, Direction.DOWN);
         }
     }
+
+    private static void simulation1u1e(List<Floor> floorList) throws InterruptedException {
+        Floor srcFloor = floorList.get(4);
+        //想去什么楼层
+        Floor targetFloor = floorList.get(2);
+        User user = new User("lucy0", targetFloor);
+        System.out.println("src_floorNo="+srcFloor.getFloorNo()+" "+user);
+        srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
+    }
+
+    private static void simulationNu1e(List<Floor> floorList) throws InterruptedException {
+        Floor srcFloor = floorList.get(3);
+        //想去什么楼层
+        Floor targetFloor = floorList.get(2);
+        User user = new User("lucy0", targetFloor);
+        System.out.println("src_floorNo="+srcFloor.getFloorNo()+" "+user);
+        srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
+
+        TimeUnit.SECONDS.sleep(1);
+
+        srcFloor = floorList.get(3);
+        //想去什么楼层
+        targetFloor = floorList.get(4);
+        user = new User("lucy1", targetFloor);
+        System.out.println("src_floorNo="+srcFloor.getFloorNo()+" "+user);
+        srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
+    }
+/*
+    private static void simulationNuNe(List<Floor> floorList) throws InterruptedException {
+        Floor srcFloor = floorList.get(3);
+        //想去什么楼层
+        Floor targetFloor = floorList.get(2);
+        User user = new User("lucy0", targetFloor);
+        System.out.println("src_floorNo="+srcFloor.getFloorNo()+" "+user);
+        srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
+
+        TimeUnit.SECONDS.sleep(1);
+
+        srcFloor = floorList.get(3);
+        //想去什么楼层
+        targetFloor = floorList.get(4);
+        user = new User("lucy1", targetFloor);
+        System.out.println("src_floorNo="+srcFloor.getFloorNo()+" "+user);
+        srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
+    }*/
 
     /**
      * 返回一下不一样的楼层

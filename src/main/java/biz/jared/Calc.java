@@ -1,6 +1,8 @@
 package biz.jared;
 
 import biz.jared.domain.Floor;
+import biz.jared.domain.enumeration.Direction;
+import biz.jared.domain.enumeration.ElevatorStatus;
 
 public class Calc {
     /**
@@ -14,4 +16,8 @@ public class Calc {
         return src.getFloorNo() - target.getFloorNo();
     }
 
+    public static boolean isSameDirection(ElevatorStatus status, Direction direction) {
+        return status.equals(ElevatorStatus.RUNNING_UP) && direction.equals(Direction.UP)
+            || status.equals(ElevatorStatus.RUNNING_DOWN) && direction.equals(Direction.DOWN);
+    }
 }
