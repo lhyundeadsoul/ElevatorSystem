@@ -8,7 +8,7 @@ import java.util.Random;
 /**
  * @author jared
  */
-public class Task implements Comparable<Task>{
+public class Task implements Comparable<Task> {
     private int id;
     /**
      * 产生此task的源楼层
@@ -22,6 +22,7 @@ public class Task implements Comparable<Task>{
     private TaskStatus status;
 
     private int priority;
+
     private Task(int id, Floor srcFloor) {
         this.id = id;
         this.srcFloor = srcFloor;
@@ -35,6 +36,7 @@ public class Task implements Comparable<Task>{
 
     /**
      * 楼层产生任务
+     *
      * @param floor
      * @param direction
      * @return
@@ -48,16 +50,9 @@ public class Task implements Comparable<Task>{
      *
      * @return 取消成功与否，成功取消 true
      */
-    public boolean cancel() {
-        synchronized (status) {
-            if (!TaskStatus.RUNNING.equals(status)) {
-                status = TaskStatus.CANCELLED;
-                System.out.println(this + " cancelled");
-                return true;
-            } else {
-                return false;
-            }
-        }
+    public void cancel() {
+        status = TaskStatus.CANCELLED;
+        System.out.println(this + " cancelled");
     }
 
     public Floor getSrcFloor() {
@@ -75,10 +70,10 @@ public class Task implements Comparable<Task>{
     @Override
     public String toString() {
         return "Task{" +
-                "id=" + id +
-                ", src floor=" + srcFloor.getFloorNo() +
-                ", direction=" + direction +
-                '}';
+            "id=" + id +
+            ", src floor=" + srcFloor.getFloorNo() +
+            ", direction=" + direction +
+            '}';
     }
 
     public void setPriority(int priority) {
