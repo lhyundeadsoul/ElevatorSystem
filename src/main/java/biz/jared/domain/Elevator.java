@@ -95,15 +95,10 @@ public class Elevator implements Runnable {
                 task = taskQueue.take();
                 //execute it
                 execTask(task);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | TaskCancelledException e) {
                 System.out.println(this + " take task error: " + e);
-            } catch (CannotExecTaskException e) {//不能执行的任务要重新分配
-                System.out.println(task + " can not be executed by " + this + " redispatch...");
-                dispatcher.redispatch(task);
-            } catch (TaskCancelledException e) {
-                System.out.println(task + " has been cancelled");
-            } catch (TaskGrabbedException e) {
-                System.out.println(task + " has been grabbed, Execution delay");
+            } catch (CannotExecTaskException | TaskGrabbedException e) {//不能执行的任务要重新分配
+                System.out.println(task + " can not be executed by " + this + " caused by "+ e +" so redispatching...");
                 dispatcher.redispatch(task);
             } finally {
                 //finish, i'm idle
