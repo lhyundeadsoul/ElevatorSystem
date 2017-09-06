@@ -111,6 +111,12 @@ public class Floor {
         }
     }
 
+    public void done(Direction direction) {
+        if (waitingDirectionMap.containsKey(direction)) {
+            waitingDirectionMap.remove(direction);
+        }
+    }
+
     @Override
     public String toString() {
         return "Floor{" +

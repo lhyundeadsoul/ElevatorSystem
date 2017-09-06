@@ -26,7 +26,7 @@ public class Task implements Comparable<Task> {
     private Task(int id, Floor srcFloor) {
         this.id = id;
         this.srcFloor = srcFloor;
-        this.status = TaskStatus.RUNNABLE;
+        setStatus(TaskStatus.RUNNABLE);
     }
 
     private Task(int id, Floor srcFloor, Direction direction) {
@@ -50,8 +50,8 @@ public class Task implements Comparable<Task> {
      *
      * @return 取消成功与否，成功取消 true
      */
-    public void cancel() {
-        status = TaskStatus.CANCELLED;
+    void cancel() {
+        setStatus(TaskStatus.CANCELLED);
         System.out.println(this + " cancelled");
     }
 
@@ -59,7 +59,7 @@ public class Task implements Comparable<Task> {
         return srcFloor;
     }
 
-    public TaskStatus getStatus() {
+    TaskStatus getStatus() {
         return status;
     }
 
@@ -80,16 +80,51 @@ public class Task implements Comparable<Task> {
         this.priority = priority;
     }
 
-    public int getPriority() {
-        return priority;
-    }
-
-    public void setStatus(TaskStatus status) {
+    void setStatus(TaskStatus status) {
         this.status = status;
     }
 
     @Override
     public int compareTo(Task o) {
+        if (o == null) {
+            return 1;
+        }
         return priority - o.priority;
+    }
+
+    /**
+     * 当前任务优先级是否更高
+     * @param task 被比较的任务
+     * @return true when current task's priority is higher
+     */
+    boolean isPriorityHigher(Task task) {
+        return compareTo(task) < 0;
+    }
+
+    /**
+     * 正在执行的任务要让出电梯（状态改为RUNNABLE，电梯在move的过程中会发现并抛弃此任务）
+     */
+    void yield(){
+        if (getStatus().equals(TaskStatus.RUNNING)){
+            setStatus(TaskStatus.RUNNABLE);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+
+        Task task = (Task)o;
+
+        if (srcFloor != null ? !srcFloor.equals(task.srcFloor) : task.srcFloor != null) { return false; }
+        return direction == task.direction;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = srcFloor != null ? srcFloor.hashCode() : 0;
+        result = 31 * result + (direction != null ? direction.hashCode() : 0);
+        return result;
     }
 }

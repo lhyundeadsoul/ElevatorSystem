@@ -1,5 +1,9 @@
 package biz.jared.domain.enumeration;
 
+/**
+ * @author jared
+ */
+
 public enum Direction {
     UP {
         @Override
@@ -13,10 +17,10 @@ public enum Direction {
             return UP;
         }
     },
-    SAME {
+    NONE {
         @Override
         public Direction opposite() {
-            return SAME;
+            return NONE;
         }
     };
 

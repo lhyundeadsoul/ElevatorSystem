@@ -28,7 +28,7 @@ public class User {
      * @param targetFloor 目标楼层
      */
     void select(Floor targetFloor) {
-        Task task = Task.generate(targetFloor, Direction.SAME);
+        Task task = Task.generate(targetFloor, Direction.NONE);
         System.out.println(this+" select " + targetFloor + " create "+ task);
         elevator.receive(task);
     }

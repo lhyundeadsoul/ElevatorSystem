@@ -51,11 +51,11 @@ public class Dispatcher {
         Elevator elevator = dispatchStrategy.select(elevatorList, task);
         //如果选不出来电梯，就先放dispatcher这里暂存，否则交给电梯执行
         if (elevator == null) {
-            taskQueue.add(task);
             System.out.println("dispatch task:" + task + " result: cache it, don't dispatch it temporarily");
+            taskQueue.add(task);
         } else {
-            elevator.receive(task);
             System.out.println("dispatch task:" + task + " result: give it to " + elevator);
+            elevator.receive(task);
         }
         return elevator;
     }
