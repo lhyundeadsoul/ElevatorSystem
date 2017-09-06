@@ -30,7 +30,7 @@ public class SameDirectionNearestFirstPriorityStrategy implements PriorityCalcul
         int x = task.getSrcFloor().getFloorNo();
         int y = elevator.getCurrFloor().getFloorNo();
         int priority;
-        boolean isSameDirection = Calc.isSameDirection(elevator.getStatus(), task.getDirection());
+        boolean isSameDirection = Calc.isSameDirection(elevator, task);
         boolean isOnTheWay = x - y > 0;
         if (isOnTheWay && isSameDirection) {
             priority = x - y;

@@ -6,6 +6,9 @@ import biz.jared.domain.Task;
 import biz.jared.domain.enumeration.Direction;
 import biz.jared.domain.enumeration.ElevatorStatus;
 
+/**
+ * @author jared
+ */
 public class Calc {
     /**
      * 两个楼层的相对距离，可以为负
