@@ -22,7 +22,7 @@ import static biz.jared.Env.FLOOR_NUM;
  */
 public class App {
 
-    private static final int USER_NUM = 2;
+    private static final int USER_NUM = 10;
 
     public static void main(String[] args) throws InterruptedException {
         //generate all floor
@@ -61,8 +61,8 @@ public class App {
 
         //simulation
         //simulation1u(floorList);
-        simulationNu(floorList);
-        //randomSimulate(floorList);
+//        simulationNu(floorList);
+        randomSimulate(floorList);
     }
 
     private static void randomSimulate(List<Floor> floorList) throws InterruptedException {
@@ -94,7 +94,7 @@ public class App {
 
     private static void simulationNu(List<Floor> floorList) throws InterruptedException {
         //user 1
-        Floor srcFloor = floorList.get(7);
+        Floor srcFloor = floorList.get(4);
         //想去什么楼层
         Floor targetFloor = floorList.get(2);
         User user = new User("lucy0", targetFloor);

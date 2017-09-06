@@ -5,7 +5,6 @@ import biz.jared.domain.Task;
 
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * @author jared
@@ -19,8 +18,4 @@ public class RandomDispatchStrategy implements DispatchStrategy {
         return elevatorList.get(random.nextInt(elevatorList.size()));
     }
 
-    @Override
-    public Task select(List<Elevator> elevatorList, BlockingQueue<Task> taskQueue) {
-        return taskQueue == null || taskQueue.isEmpty() ? null : taskQueue.poll();
-    }
 }

@@ -123,7 +123,6 @@ public class Elevator implements Runnable {
     private void onIdle() {
         setCurrTask(null);
         setStatus(ElevatorStatus.IDLE);
-        dispatcher.dispatch(this);
     }
 
     /**

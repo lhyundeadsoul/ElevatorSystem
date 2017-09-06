@@ -4,8 +4,6 @@ import biz.jared.strategy.DispatchStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * 多电梯系统的任务总调度器
@@ -13,10 +11,6 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author jared
  */
 public class Dispatcher {
-    /**
-     * 电梯调度系统的任务列表
-     */
-    private BlockingQueue<Task> taskQueue = new LinkedBlockingQueue<>();
     /**
      * 可以调度的电梯列表
      */
@@ -32,31 +26,18 @@ public class Dispatcher {
     }
 
     /**
-     * 给一个电梯分配任务
-     *
-     * @param elevator
-     */
-    Task dispatch(Elevator elevator) {
-        Task task = dispatchStrategy.select(elevatorList, taskQueue);
-        elevator.receive(task);
-        return task;
-    }
-
-    /**
      * 给一个任务分配电梯
      *
      * @param task
      */
     Elevator dispatch(Task task) {
+        if (task == null) {
+            return null;
+        }
         Elevator elevator = dispatchStrategy.select(elevatorList, task);
         //如果选不出来电梯，就先放dispatcher这里暂存，否则交给电梯执行
-        if (elevator == null) {
-            System.out.println("dispatch task:" + task + " result: cache it, don't dispatch it temporarily");
-            taskQueue.add(task);
-        } else {
-            System.out.println("dispatch task:" + task + " result: give it to " + elevator);
-            elevator.receive(task);
-        }
+        System.out.println("dispatch task:" + task + " result: give it to " + elevator);
+        elevator.receive(task);
         return elevator;
     }
 
