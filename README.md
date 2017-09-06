@@ -17,3 +17,5 @@ a Multi-elevator System
 - [ ] 电梯任务抢占
 - [ ] todo
 - [ ] sync block
+- [ ] UT
+- [ ] CI
