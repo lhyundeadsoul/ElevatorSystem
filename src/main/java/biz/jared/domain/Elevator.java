@@ -35,6 +35,10 @@ public class Elevator implements Runnable {
      */
     private Set<User> currLoad = new HashSet<>(MAX_LOAD);
     /**
+     * 当前正在执行的任务
+     */
+    private Task currTask;
+    /**
      * 最大负载人数
      */
     private static final int MAX_LOAD = 10;
@@ -77,6 +81,11 @@ public class Elevator implements Runnable {
                 //定好优先级再放入队列
                 task.setPriority(priorityCalculationStrategy.calcPriority(this, task));
                 taskQueue.put(task);
+                //如果当前任务比电梯正在执行的任务优先级还优先（priority较小，相等都不算），则发生任务抢占
+                if (task.isPriorityHigher(currTask)) {
+                    //改成runnable状态可以让电梯在move的过程中发现已被抢占
+                    currTask.yield();
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -112,6 +121,7 @@ public class Elevator implements Runnable {
      * 电梯空闲时要主动找dispatcher尝试领task
      */
     private void onIdle() {
+        setCurrTask(null);
         setStatus(ElevatorStatus.IDLE);
         dispatcher.dispatch(this);
     }
@@ -128,6 +138,8 @@ public class Elevator implements Runnable {
         if (task == null) {
             return;
         }
+        setCurrTask(task);
+        System.out.println("start to execute task " + currTask);
         //以下为执行任务逻辑
         //无法执行：已经满载且当前楼层没人下的电梯，要将自身的任务重新交给dispatcher分配
         if (currLoad.size() == MAX_LOAD && !canReduceLoad(task.getSrcFloor())) {
@@ -160,12 +172,12 @@ public class Elevator implements Runnable {
         if (reduceSet.size() > 0) {
             //电梯增加负载
             currLoad.addAll(reduceSet);
+            System.out.println(this + " loading " + reduceSet.size() + " users:" + reduceSet);
             //每个上电梯的人都按一下想去的楼层
             reduceSet.forEach(user -> {
                 user.enterElevator(this);
                 user.select(user.getTargetFloor());
             });
-            System.out.println(this + " loading " + reduceSet.size() + " users：" + reduceSet);
         }
     }
 
@@ -187,14 +199,16 @@ public class Elevator implements Runnable {
      * @param task
      */
     private void move(Task task) throws TaskCancelledException, TaskGrabbedException, InterruptedException {
+        //设置任务状态
         task.setStatus(TaskStatus.RUNNING);
 
+        //设置电梯运行状态
         Direction relativeDirection = task.getSrcFloor().locate(currFloor);
         setStatus(Direction.UP.equals(relativeDirection) ? ElevatorStatus.RUNNING_UP : ElevatorStatus.RUNNING_DOWN);
 
-        //相对距离，可为负
-        int distance = Calc.calcDistance(currFloor, task.getSrcFloor());
-        for (int i = 0; i < Math.abs(distance); i++) {
+        //算好绝对距离，向目标楼层进发
+        int distance = Math.abs(Calc.calcDistance(currFloor, task.getSrcFloor()));
+        for (int i = 0; i < distance; i++) {
             //已取消的任务停止执行
             if (task.getStatus().equals(TaskStatus.CANCELLED)) {
                 throw new TaskCancelledException();
@@ -203,7 +217,7 @@ public class Elevator implements Runnable {
             if (task.getStatus().equals(TaskStatus.RUNNABLE)) {
                 throw new TaskGrabbedException();
             }
-            //楼层移动耗时1s
+            //楼层移动耗时
             TimeUnit.SECONDS.sleep(1);
             //改变电梯的当前楼层
             currFloor = currFloor.next(relativeDirection);
@@ -234,6 +248,10 @@ public class Elevator implements Runnable {
 
     private void setStatus(ElevatorStatus status) {
         this.status = status;
+    }
+
+    public void setCurrTask(Task currTask) {
+        this.currTask = currTask;
     }
 
     public void setDispatcher(Dispatcher dispatcher) {

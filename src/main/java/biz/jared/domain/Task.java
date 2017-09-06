@@ -90,6 +90,45 @@ public class Task implements Comparable<Task> {
 
     @Override
     public int compareTo(Task o) {
+        if (o == null) {
+            return 1;
+        }
         return priority - o.priority;
+    }
+
+    /**
+     * 当前任务优先级是否更高
+     * @param task 被比较的任务
+     * @return true when current task's priority is higher
+     */
+    public boolean isPriorityHigher(Task task) {
+        return compareTo(task) < 0;
+    }
+
+    /**
+     * 正在执行的任务要让出电梯（状态改为RUNNABLE，电梯在move的过程中会发现并抛弃此任务）
+     */
+    public void yield(){
+        if (status.equals(TaskStatus.RUNNING)){
+            status = TaskStatus.RUNNABLE;
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+
+        Task task = (Task)o;
+
+        if (srcFloor != null ? !srcFloor.equals(task.srcFloor) : task.srcFloor != null) { return false; }
+        return direction == task.direction;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = srcFloor != null ? srcFloor.hashCode() : 0;
+        result = 31 * result + (direction != null ? direction.hashCode() : 0);
+        return result;
     }
 }

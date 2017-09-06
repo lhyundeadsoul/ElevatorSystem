@@ -1,6 +1,10 @@
 package biz.jared;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+
 import biz.jared.domain.Floor;
+import biz.jared.domain.Task;
 import biz.jared.domain.enumeration.Direction;
 import biz.jared.domain.enumeration.ElevatorStatus;
 
@@ -20,4 +24,5 @@ public class Calc {
         return status.equals(ElevatorStatus.RUNNING_UP) && direction.equals(Direction.UP)
             || status.equals(ElevatorStatus.RUNNING_DOWN) && direction.equals(Direction.DOWN);
     }
+
 }
