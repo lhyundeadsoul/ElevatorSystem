@@ -21,6 +21,6 @@ public class RandomDispatchStrategy implements DispatchStrategy {
 
     @Override
     public Task select(List<Elevator> elevatorList, BlockingQueue<Task> taskQueue) {
-        return taskQueue == null || taskQueue.size() == 0 ? null : taskQueue.poll();
+        return taskQueue == null || taskQueue.isEmpty() ? null : taskQueue.poll();
     }
 }
