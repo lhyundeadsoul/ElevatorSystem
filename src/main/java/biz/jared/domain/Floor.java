@@ -76,14 +76,14 @@ public class Floor {
     /**
      * 楼层可以减少num人
      *
-     *
      * @param direction 可以带走向哪个方向走的人
-     * @param num 可以减少的人数
+     * @param num       可以减少的人数
      * @return 减少的人集合
      */
     Set<User> reduce(Direction direction, int num) {
-        Set<User> reduceSet;
+        //准备接走哪一个方向的人，另一个方向的人不能上
         Set<User> waitingUserSet = direction.equals(Direction.UP) ? waitingUpUserSet : waitingDownUserSet;
+        Set<User> reduceSet;
         //电梯剩余负载大于所有等候人数的情况，全上。否则只上随机的一部分
         if (num >= waitingUserSet.size()) {
             reduceSet = waitingUserSet;
@@ -114,8 +114,8 @@ public class Floor {
     @Override
     public String toString() {
         return "Floor{" +
-                "floorNo=" + floorNo +
-                '}';
+            "floorNo=" + floorNo +
+            '}';
     }
 
     public void setDispatcher(Dispatcher dispatcher) {
@@ -131,7 +131,7 @@ public class Floor {
             return false;
         }
 
-        Floor floor = (Floor) o;
+        Floor floor = (Floor)o;
 
         return floorNo == floor.floorNo;
     }
