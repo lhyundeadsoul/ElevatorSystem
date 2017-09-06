@@ -26,7 +26,7 @@ public class Task implements Comparable<Task> {
     private Task(int id, Floor srcFloor) {
         this.id = id;
         this.srcFloor = srcFloor;
-        this.status = TaskStatus.RUNNABLE;
+        setStatus(TaskStatus.RUNNABLE);
     }
 
     private Task(int id, Floor srcFloor, Direction direction) {
@@ -50,8 +50,8 @@ public class Task implements Comparable<Task> {
      *
      * @return 取消成功与否，成功取消 true
      */
-    public void cancel() {
-        status = TaskStatus.CANCELLED;
+    void cancel() {
+        setStatus(TaskStatus.CANCELLED);
         System.out.println(this + " cancelled");
     }
 
@@ -59,7 +59,7 @@ public class Task implements Comparable<Task> {
         return srcFloor;
     }
 
-    public TaskStatus getStatus() {
+    TaskStatus getStatus() {
         return status;
     }
 
@@ -80,11 +80,7 @@ public class Task implements Comparable<Task> {
         this.priority = priority;
     }
 
-    public int getPriority() {
-        return priority;
-    }
-
-    public void setStatus(TaskStatus status) {
+    void setStatus(TaskStatus status) {
         this.status = status;
     }
 
@@ -101,16 +97,16 @@ public class Task implements Comparable<Task> {
      * @param task 被比较的任务
      * @return true when current task's priority is higher
      */
-    public boolean isPriorityHigher(Task task) {
+    boolean isPriorityHigher(Task task) {
         return compareTo(task) < 0;
     }
 
     /**
      * 正在执行的任务要让出电梯（状态改为RUNNABLE，电梯在move的过程中会发现并抛弃此任务）
      */
-    public void yield(){
-        if (status.equals(TaskStatus.RUNNING)){
-            status = TaskStatus.RUNNABLE;
+    void yield(){
+        if (getStatus().equals(TaskStatus.RUNNING)){
+            setStatus(TaskStatus.RUNNABLE);
         }
     }
 

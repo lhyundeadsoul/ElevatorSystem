@@ -1,8 +1,6 @@
 package biz.jared;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
-
+import biz.jared.domain.Elevator;
 import biz.jared.domain.Floor;
 import biz.jared.domain.Task;
 import biz.jared.domain.enumeration.Direction;
@@ -20,9 +18,18 @@ public class Calc {
         return src.getFloorNo() - target.getFloorNo();
     }
 
-    public static boolean isSameDirection(ElevatorStatus status, Direction direction) {
-        return status.equals(ElevatorStatus.RUNNING_UP) && direction.equals(Direction.UP)
-            || status.equals(ElevatorStatus.RUNNING_DOWN) && direction.equals(Direction.DOWN);
+    /**
+     * 是否任务和电梯同相（任务方向是NONE也算）
+     *
+     * @param elevator
+     * @param task
+     * @return
+     */
+    public static boolean isSameDirection(Elevator elevator, Task task) {
+        return (elevator.getStatus().equals(ElevatorStatus.RUNNING_UP)
+            && (task.getDirection().equals(Direction.UP) || task.getDirection().equals(Direction.NONE)))
+            || (elevator.getStatus().equals(ElevatorStatus.RUNNING_DOWN)
+            && (task.getDirection().equals(Direction.DOWN) || task.getDirection().equals(Direction.NONE)));
     }
 
 }

@@ -139,12 +139,16 @@ public class Elevator implements Runnable {
             return;
         }
         setCurrTask(task);
-        System.out.println("start to execute task " + currTask);
         //以下为执行任务逻辑
         //无法执行：已经满载且当前楼层没人下的电梯，要将自身的任务重新交给dispatcher分配
         if (currLoad.size() == MAX_LOAD && !canReduceLoad(task.getSrcFloor())) {
             throw new CannotExecTaskException();
         }
+        //在任务执行之前检查已经被取消的任务
+        if (task.getStatus().equals(TaskStatus.CANCELLED)){
+            throw new TaskCancelledException();
+        }
+        System.out.println("start to execute " + currTask);
         //执行
         //1. move currFloor
         move(task);
@@ -154,6 +158,8 @@ public class Elevator implements Runnable {
         unload();
         //3. load user who wanna go task's direction
         load(task.getDirection());
+        //4. current floor task has bean done
+        currFloor.done(task.getDirection());
     }
 
     /**
@@ -209,11 +215,11 @@ public class Elevator implements Runnable {
         //算好绝对距离，向目标楼层进发
         int distance = Math.abs(Calc.calcDistance(currFloor, task.getSrcFloor()));
         for (int i = 0; i < distance; i++) {
-            //已取消的任务停止执行
+            //执行过程中检查，已取消的任务停止执行
             if (task.getStatus().equals(TaskStatus.CANCELLED)) {
                 throw new TaskCancelledException();
             }
-            //已被抢占的任务停止执行
+            //执行过程中检查，已被抢占的任务停止执行
             if (task.getStatus().equals(TaskStatus.RUNNABLE)) {
                 throw new TaskGrabbedException();
             }

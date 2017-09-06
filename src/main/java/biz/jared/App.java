@@ -60,8 +60,8 @@ public class App {
         elevatorList.forEach(elevator -> new Thread(elevator, "elevator-thread-" + elevator.getId()).start());
 
         //simulation
-        //simulation1u1e(floorList);
-        simulationNu1e(floorList);
+        //simulation1u(floorList);
+        simulationNu(floorList);
         //randomSimulate(floorList);
     }
 
@@ -83,35 +83,18 @@ public class App {
         }
     }
 
-    private static void simulation1u1e(List<Floor> floorList) throws InterruptedException {
-        Floor srcFloor = floorList.get(0);
+    private static void simulation1u(List<Floor> floorList) throws InterruptedException {
+        Floor srcFloor = floorList.get(4);
         //想去什么楼层
-        Floor targetFloor = floorList.get(4);
+        Floor targetFloor = floorList.get(3);
         User user = new User("lucy0", targetFloor);
         System.out.println("src_floorNo="+srcFloor.getFloorNo()+" "+user);
         srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
     }
 
-    private static void simulationNu1e(List<Floor> floorList) throws InterruptedException {
-        Floor srcFloor = floorList.get(3);
-        //想去什么楼层
-        Floor targetFloor = floorList.get(1);
-        User user = new User("lucy0", targetFloor);
-        System.out.println("src_floorNo="+srcFloor.getFloorNo()+" "+user);
-        srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
-
-        TimeUnit.SECONDS.sleep(2);
-
-        srcFloor = floorList.get(2);
-        //想去什么楼层
-        targetFloor = floorList.get(4);
-        user = new User("lucy1", targetFloor);
-        System.out.println("src_floorNo="+srcFloor.getFloorNo()+" "+user);
-        srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
-    }
-/*
-    private static void simulationNuNe(List<Floor> floorList) throws InterruptedException {
-        Floor srcFloor = floorList.get(3);
+    private static void simulationNu(List<Floor> floorList) throws InterruptedException {
+        //user 1
+        Floor srcFloor = floorList.get(7);
         //想去什么楼层
         Floor targetFloor = floorList.get(2);
         User user = new User("lucy0", targetFloor);
@@ -120,13 +103,17 @@ public class App {
 
         TimeUnit.SECONDS.sleep(1);
 
-        srcFloor = floorList.get(3);
+        //user 2
+        Floor srcFloor2 = floorList.get(2);
         //想去什么楼层
-        targetFloor = floorList.get(4);
-        user = new User("lucy1", targetFloor);
-        System.out.println("src_floorNo="+srcFloor.getFloorNo()+" "+user);
-        srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
-    }*/
+        Floor targetFloor2 = floorList.get(4);
+        user = new User("lucy1", targetFloor2);
+        System.out.println("src_floorNo="+srcFloor2.getFloorNo()+" "+user);
+        srcFloor2.add(user, srcFloor2.locate(targetFloor2).opposite());
+
+        TimeUnit.SECONDS.sleep(4);
+        srcFloor.cancel(srcFloor.locate(targetFloor).opposite());
+    }
 
     /**
      * 返回一下不一样的楼层
