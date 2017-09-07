@@ -1,22 +1,21 @@
 package biz.jared.domain;
 
-import biz.jared.Calc;
-import biz.jared.Env;
-import biz.jared.domain.enumeration.Direction;
-import biz.jared.domain.enumeration.ElevatorStatus;
-import biz.jared.domain.enumeration.TaskStatus;
-import biz.jared.exception.CannotExecTaskException;
-import biz.jared.exception.UserInElevatorTaskGrabbedException;
-import biz.jared.exception.TaskCancelledException;
-import biz.jared.exception.UserInFloorTaskGrabbedException;
-import biz.jared.strategy.PriorityCalculationStrategy;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import biz.jared.Calc;
+import biz.jared.domain.enumeration.Direction;
+import biz.jared.domain.enumeration.ElevatorStatus;
+import biz.jared.domain.enumeration.TaskStatus;
+import biz.jared.exception.CannotExecTaskException;
+import biz.jared.exception.TaskCancelledException;
+import biz.jared.exception.UserInElevatorTaskGrabbedException;
+import biz.jared.exception.UserInFloorTaskGrabbedException;
+import biz.jared.strategy.PriorityCalculationStrategy;
 
 import static biz.jared.Env.MAX_LOAD;
 
@@ -87,6 +86,7 @@ public class Elevator implements Runnable {
     /**
      * 是否可以抢占
      * 重新计算当前任务的优先级，并和当前收到的任务进行比较
+     *
      * @param task
      * @return
      */
@@ -279,12 +279,12 @@ public class Elevator implements Runnable {
         return status;
     }
 
-    public Floor getCurrFloor() {
-        return currFloor;
-    }
-
     private void setStatus(ElevatorStatus status) {
         this.status = status;
+    }
+
+    public Floor getCurrFloor() {
+        return currFloor;
     }
 
     public void setCurrTask(Task currTask) {

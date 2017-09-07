@@ -4,7 +4,6 @@ import biz.jared.Calc;
 import biz.jared.Env;
 import biz.jared.domain.Elevator;
 import biz.jared.domain.Task;
-import biz.jared.domain.enumeration.ElevatorStatus;
 
 /**
  * 同相距离最近优先策略
@@ -15,6 +14,7 @@ import biz.jared.domain.enumeration.ElevatorStatus;
 public class SameDirectionNearestFirstPriorityStrategy implements PriorityCalculationStrategy {
 
     private static final int MAX_PRIORITY = 2 * Env.FLOOR_NUM;
+
     /**
      * x = 任务所处楼层号
      * y = 电梯所处楼层号

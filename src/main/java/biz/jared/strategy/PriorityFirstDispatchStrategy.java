@@ -6,6 +6,8 @@ import biz.jared.domain.Elevator;
 import biz.jared.domain.Task;
 
 /**
+ * 能给出最好的执行优先级的电梯可获得任务
+ *
  * @author jared
  * @date 2017/08/30
  */

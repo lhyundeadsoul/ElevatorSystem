@@ -1,9 +1,9 @@
 package biz.jared.domain;
 
+import java.util.Random;
+
 import biz.jared.domain.enumeration.Direction;
 import biz.jared.domain.enumeration.TaskStatus;
-
-import java.util.Random;
 
 /**
  * @author jared
@@ -23,14 +23,10 @@ public class Task implements Comparable<Task> {
 
     private int priority;
 
-    private Task(int id, Floor srcFloor) {
+    private Task(int id, Floor srcFloor, Direction direction) {
         this.id = id;
         this.srcFloor = srcFloor;
         setStatus(TaskStatus.RUNNABLE);
-    }
-
-    private Task(int id, Floor srcFloor, Direction direction) {
-        this(id, srcFloor);
         this.direction = direction;
     }
 
@@ -41,7 +37,7 @@ public class Task implements Comparable<Task> {
      * @param direction
      * @return
      */
-    public static Task generate(Floor floor, Direction direction) {
+    static Task generate(Floor floor, Direction direction) {
         return new Task(new Random().nextInt(10000), floor, direction);
     }
 
@@ -63,6 +59,10 @@ public class Task implements Comparable<Task> {
         return status;
     }
 
+    void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+
     public Direction getDirection() {
         return direction;
     }
@@ -76,12 +76,8 @@ public class Task implements Comparable<Task> {
             '}';
     }
 
-    public void setPriority(int priority) {
+    void setPriority(int priority) {
         this.priority = priority;
-    }
-
-    void setStatus(TaskStatus status) {
-        this.status = status;
     }
 
     @Override
@@ -94,18 +90,19 @@ public class Task implements Comparable<Task> {
 
     /**
      * 当前任务优先级是否更高
-     * @return true when current task's priority is higher
+     *
      * @param task
+     * @return true when current task's priority is higher
      */
-    public boolean isPriorityHigherThan(Task task) {
+    boolean isPriorityHigherThan(Task task) {
         return compareTo(task) < 0;
     }
 
     /**
      * 正在执行的任务要让出电梯（状态改为RUNNABLE，电梯在move的过程中会发现并抛弃此任务）
      */
-    void yield(){
-        if (getStatus().equals(TaskStatus.RUNNING)){
+    void yield() {
+        if (getStatus().equals(TaskStatus.RUNNING)) {
             setStatus(TaskStatus.RUNNABLE);
         }
     }
@@ -117,16 +114,8 @@ public class Task implements Comparable<Task> {
 
         Task task = (Task)o;
 
-        if (srcFloor != null ? !srcFloor.equals(task.srcFloor) : task.srcFloor != null) { return false; }
-        return direction == task.direction;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public int getPriority() {
-        return priority;
+        return (srcFloor != null ? srcFloor.equals(task.srcFloor) : task.srcFloor == null)
+            && direction == task.direction;
     }
 
     @Override

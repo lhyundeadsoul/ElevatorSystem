@@ -11,7 +11,7 @@ import biz.jared.domain.Floor;
 import biz.jared.domain.User;
 import biz.jared.strategy.DispatchStrategy;
 import biz.jared.strategy.PriorityCalculationStrategy;
-import biz.jared.strategy.RandomDispatchStrategy;
+import biz.jared.strategy.PriorityFirstDispatchStrategy;
 import biz.jared.strategy.SameDirectionNearestFirstPriorityStrategy;
 
 import static biz.jared.Env.ELEVATOR_NUM;
@@ -19,6 +19,7 @@ import static biz.jared.Env.FLOOR_NUM;
 
 /**
  * App Start
+ *
  * @author jared
  */
 public class App {
@@ -42,12 +43,12 @@ public class App {
         //generate all elevator
         List<Elevator> elevatorList = new ArrayList<>(ELEVATOR_NUM);
         for (int i = 0; i < ELEVATOR_NUM; i++) {
-            elevatorList.add(new Elevator(i, floorList.get(FLOOR_NUM-1), priorityStrategy));
+            elevatorList.add(new Elevator(i, floorList.get(0), priorityStrategy));
         }
 
         //make dispatch strategy
-        DispatchStrategy dispatchStrategy = new RandomDispatchStrategy();
-        //DispatchStrategy dispatchStrategy = new PriorityFirstDispatchStrategy();
+        //DispatchStrategy dispatchStrategy = new RandomDispatchStrategy();
+        DispatchStrategy dispatchStrategy = new PriorityFirstDispatchStrategy();
 
         //generate dispatcher
         Dispatcher dispatcher = new Dispatcher(elevatorList, dispatchStrategy);
@@ -63,7 +64,7 @@ public class App {
 
         //simulation
         //simulation1u(floorList);
-//        simulationNu(floorList);
+        //        simulationNu(floorList);
         randomSimulate(floorList);
     }
 
@@ -78,7 +79,7 @@ public class App {
             //想去什么楼层
             Floor targetFloor = floorList.get(differentFloorNo(randomSrcFloorNo));
             User user = new User("lucy" + i, targetFloor);
-            System.out.println("src_floorNo="+srcFloor.getFloorNo()+" "+user);
+            System.out.println("src_floorNo=" + srcFloor.getFloorNo() + " " + user);
             //srcFloor.locate(targetFloor).opposite()，结果Direction一定是对的，但是这里也支持传错的，也符合实际
             srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
             //srcFloor.add(user, Direction.DOWN);
@@ -90,7 +91,7 @@ public class App {
         //想去什么楼层
         Floor targetFloor = floorList.get(3);
         User user = new User("lucy0", targetFloor);
-        System.out.println("src_floorNo="+srcFloor.getFloorNo()+" "+user);
+        System.out.println("src_floorNo=" + srcFloor.getFloorNo() + " " + user);
         srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
     }
 
@@ -100,7 +101,7 @@ public class App {
         //想去什么楼层
         Floor targetFloor = floorList.get(2);
         User user = new User("lucy0", targetFloor);
-        System.out.println("src_floorNo="+srcFloor.getFloorNo()+" "+user);
+        System.out.println("src_floorNo=" + srcFloor.getFloorNo() + " " + user);
         srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
 
         TimeUnit.SECONDS.sleep(1);
@@ -110,7 +111,7 @@ public class App {
         //想去什么楼层
         Floor targetFloor2 = floorList.get(4);
         user = new User("lucy1", targetFloor2);
-        System.out.println("src_floorNo="+srcFloor2.getFloorNo()+" "+user);
+        System.out.println("src_floorNo=" + srcFloor2.getFloorNo() + " " + user);
         srcFloor2.add(user, srcFloor2.locate(targetFloor2).opposite());
 
         TimeUnit.SECONDS.sleep(4);
@@ -119,6 +120,7 @@ public class App {
 
     /**
      * 返回一下不一样的楼层
+     *
      * @param randomSrcFloorNo
      * @return
      */

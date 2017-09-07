@@ -118,7 +118,7 @@ public class Floor {
         }
     }
 
-    public void done(Direction direction) {
+    void done(Direction direction) {
         if (waitingDirectionMap.containsKey(direction)) {
             waitingDirectionMap.remove(direction);
         }

@@ -29,7 +29,7 @@ public class User {
      */
     void select(Floor targetFloor) {
         Task task = Task.generate(targetFloor, Direction.NONE);
-        System.out.println(this+" select " + targetFloor + " create "+ task);
+        System.out.println(this + " select " + targetFloor + " create " + task);
         elevator.receive(task);
     }
 
@@ -44,9 +44,9 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "name='" + name + '\'' +
-                ", targetFloor=" + targetFloor.getFloorNo() +
-                '}';
+            "name='" + name + '\'' +
+            ", targetFloor=" + targetFloor.getFloorNo() +
+            '}';
     }
 
     @Override
