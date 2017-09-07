@@ -64,8 +64,8 @@ public class App {
 
         //simulation
         //simulation1u(floorList);
-        //simulationNu(floorList);
-        randomSimulate(floorList);
+        simulationNu(floorList);
+//        randomSimulate(floorList);
     }
 
     private static void randomSimulate(List<Floor> floorList) throws InterruptedException {
@@ -97,29 +97,29 @@ public class App {
 
     private static void simulationNu(List<Floor> floorList) throws InterruptedException {
         //user 1
-        Floor srcFloor = floorList.get(2);
+        Floor srcFloor = floorList.get(3);
         //想去什么楼层
-        Floor targetFloor = floorList.get(1);
+        Floor targetFloor = floorList.get(0);
         User user = new User("lucy0", targetFloor);
         System.out.println("src_floorNo=" + srcFloor.getFloorNo() + " " + user);
         srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
 
-        TimeUnit.SECONDS.sleep(1);
+//        TimeUnit.SECONDS.sleep(1);
 
         //user 2
-        Floor srcFloor2 = floorList.get(2);
+        Floor srcFloor2 = floorList.get(4);
         //想去什么楼层
-        Floor targetFloor2 = floorList.get(1);
+        Floor targetFloor2 = floorList.get(2);
         user = new User("lucy1", targetFloor2);
         System.out.println("src_floorNo=" + srcFloor2.getFloorNo() + " " + user);
         srcFloor2.add(user, srcFloor2.locate(targetFloor2).opposite());
 
-        TimeUnit.SECONDS.sleep(1);
+//        TimeUnit.SECONDS.sleep(1);
 
         //user 3
-        Floor srcFloor3 = floorList.get(2);
+        Floor srcFloor3 = floorList.get(1);
         //想去什么楼层
-        Floor targetFloor3 = floorList.get(1);
+        Floor targetFloor3 = floorList.get(3);
         user = new User("lucy2", targetFloor3);
         System.out.println("src_floorNo=" + srcFloor3.getFloorNo() + " " + user);
         srcFloor3.add(user, srcFloor3.locate(targetFloor3).opposite());

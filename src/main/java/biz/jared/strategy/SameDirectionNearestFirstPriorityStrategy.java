@@ -4,6 +4,7 @@ import biz.jared.Calc;
 import biz.jared.Env;
 import biz.jared.domain.Elevator;
 import biz.jared.domain.Task;
+import biz.jared.domain.enumeration.Direction;
 
 /**
  * 同相距离最近优先策略
@@ -39,31 +40,18 @@ public class SameDirectionNearestFirstPriorityStrategy implements PriorityCalcul
         int y = elevator.getCurrFloor().getFloorNo();
         int priority;
         boolean isSameDirection = Calc.isSameDirection(elevator, task);
-        boolean isOnTheWay;
 
         switch (elevator.getStatus()) {
             case RUNNING_UP:
-                isOnTheWay = x > y;
-                if (isOnTheWay && isSameDirection) {
-                    priority = x - y;
-                } else if (!isOnTheWay && isSameDirection) {
-                    priority = MAX_PRIORITY - x + y;
-                } else {
-                    priority = MAX_PRIORITY - x - y;
-                }
+                priority = calcPriorityOnRunningUp(x, y, isSameDirection);
                 break;
             case RUNNING_DOWN:
-                isOnTheWay = y > x;
-                if (isOnTheWay && isSameDirection) {
-                    priority = y - x;
-                } else if (!isOnTheWay && isSameDirection) {
-                    priority = MAX_PRIORITY - x + y;
-                } else {
-                    priority = x + y;
-                }
+                priority = calcPriorityOnRunningDown(x, y, isSameDirection);
                 break;
-            case IDLE:
-                priority = Math.abs(task.getSrcFloor().getFloorNo() - elevator.getCurrFloor().getFloorNo());
+            case IDLE://从idle状态被任务带动的电梯，其优先级要按有运动方向
+                priority = Direction.UP.equals(task.getSrcFloor().locate(elevator.getCurrFloor()))
+                        ? calcPriorityOnRunningUp(x, y, isSameDirection)
+                        : calcPriorityOnRunningDown(x,y,isSameDirection);
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -71,6 +59,32 @@ public class SameDirectionNearestFirstPriorityStrategy implements PriorityCalcul
         //priority已经是2倍楼层总数了，优先级要循环
         if (priority == MAX_PRIORITY) {
             priority = 0;
+        }
+        return priority;
+    }
+
+    private int calcPriorityOnRunningDown(int x, int y, boolean isSameDirection) {
+        int priority;
+        boolean isOnTheWay = y > x;
+        if (isOnTheWay && isSameDirection) {
+            priority = y - x;
+        } else if (!isOnTheWay && isSameDirection) {
+            priority = MAX_PRIORITY - x + y;
+        } else {
+            priority = x + y;
+        }
+        return priority;
+    }
+
+    private int calcPriorityOnRunningUp(int x, int y, boolean isSameDirection) {
+        boolean isOnTheWay = x > y;
+        int priority;
+        if (isOnTheWay && isSameDirection) {
+            priority = x - y;
+        } else if (!isOnTheWay && isSameDirection) {
+            priority = MAX_PRIORITY - x + y;
+        } else {
+            priority = MAX_PRIORITY - x - y;
         }
         return priority;
     }

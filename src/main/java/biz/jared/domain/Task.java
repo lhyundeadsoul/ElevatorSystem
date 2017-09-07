@@ -77,6 +77,7 @@ public class Task implements Comparable<Task> {
     }
 
     void setPriority(int priority) {
+        System.out.println("--------"+this+"  "+priority);
         this.priority = priority;
     }
 
