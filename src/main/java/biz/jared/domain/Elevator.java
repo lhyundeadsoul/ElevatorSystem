@@ -295,6 +295,10 @@ public class Elevator implements Runnable {
         this.dispatcher = dispatcher;
     }
 
+    public Set<User> getCurrLoad() {
+        return currLoad;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }

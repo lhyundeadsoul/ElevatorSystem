@@ -24,7 +24,7 @@ import static biz.jared.Env.FLOOR_NUM;
  */
 public class App {
 
-    private static final int USER_NUM = 10;
+    private static final int USER_NUM = 3;
 
     public static void main(String[] args) throws InterruptedException {
         //generate all floor
@@ -64,7 +64,7 @@ public class App {
 
         //simulation
         //simulation1u(floorList);
-        //        simulationNu(floorList);
+        //simulationNu(floorList);
         randomSimulate(floorList);
     }
 
@@ -97,9 +97,9 @@ public class App {
 
     private static void simulationNu(List<Floor> floorList) throws InterruptedException {
         //user 1
-        Floor srcFloor = floorList.get(4);
+        Floor srcFloor = floorList.get(2);
         //想去什么楼层
-        Floor targetFloor = floorList.get(2);
+        Floor targetFloor = floorList.get(1);
         User user = new User("lucy0", targetFloor);
         System.out.println("src_floorNo=" + srcFloor.getFloorNo() + " " + user);
         srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
@@ -109,13 +109,20 @@ public class App {
         //user 2
         Floor srcFloor2 = floorList.get(2);
         //想去什么楼层
-        Floor targetFloor2 = floorList.get(4);
+        Floor targetFloor2 = floorList.get(1);
         user = new User("lucy1", targetFloor2);
         System.out.println("src_floorNo=" + srcFloor2.getFloorNo() + " " + user);
         srcFloor2.add(user, srcFloor2.locate(targetFloor2).opposite());
 
-        TimeUnit.SECONDS.sleep(4);
-        srcFloor.cancel(srcFloor.locate(targetFloor).opposite());
+        TimeUnit.SECONDS.sleep(1);
+
+        //user 3
+        Floor srcFloor3 = floorList.get(2);
+        //想去什么楼层
+        Floor targetFloor3 = floorList.get(1);
+        user = new User("lucy2", targetFloor3);
+        System.out.println("src_floorNo=" + srcFloor3.getFloorNo() + " " + user);
+        srcFloor3.add(user, srcFloor3.locate(targetFloor3).opposite());
     }
 
     /**

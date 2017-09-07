@@ -20,3 +20,4 @@ a Multi-elevator System
 - [ ] UT
 - [ ] CI
 - [ ] 全部电梯满载时会死循环
+- [ ] 加入吞吐、平均等待时间等指标

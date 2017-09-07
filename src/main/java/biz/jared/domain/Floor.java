@@ -65,6 +65,11 @@ public class Floor {
         } else if (direction.equals(Direction.DOWN)) {
             waitingDownUserSet.add(user);
         }
+        //给楼层加当前方向上的任务
+        addDirectionTask(direction);
+    }
+
+    private void addDirectionTask(Direction direction) {
         //只有之前没人说要去的方向才可以建任务，已经有人说要去的方向就不用再说一次了
         if (!waitingDirectionMap.containsKey(direction)) {
             Task task = Task.generate(this, direction);
@@ -121,6 +126,11 @@ public class Floor {
     void done(Direction direction) {
         if (waitingDirectionMap.containsKey(direction)) {
             waitingDirectionMap.remove(direction);
+            //当电梯因为满载而无法全部把人带走时，继续产生新的任务
+            Set<User> remainingUsers = direction.equals(Direction.UP) ? waitingUpUserSet : waitingDownUserSet;
+            if (!remainingUsers.isEmpty()) {
+                addDirectionTask(direction);
+            }
         }
     }
 
