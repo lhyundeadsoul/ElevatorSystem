@@ -3,6 +3,7 @@ package biz.jared.domain;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import biz.jared.strategy.DispatchStrategy;
 
@@ -35,8 +36,17 @@ public class Dispatcher {
         if (task == null) {
             return null;
         }
-        Elevator elevator = dispatchStrategy.select(elevatorList, task);
-        //如果选不出来电梯，就先放dispatcher这里暂存，否则交给电梯执行
+
+        Elevator elevator;
+        //如果选不出来电梯，就一直重试
+        while ((elevator = dispatchStrategy.select(elevatorList, task)) == null) {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+                System.out.println("all elevator is in max load , retry dispatch...");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         System.out.println("dispatch task:" + task + " result: give it to " + elevator);
         elevator.receive(task);
         return elevator;
