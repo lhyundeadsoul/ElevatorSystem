@@ -10,15 +10,16 @@ import biz.jared.domain.Elevator;
 import biz.jared.domain.Floor;
 import biz.jared.domain.User;
 import biz.jared.strategy.DispatchStrategy;
-import biz.jared.strategy.SameDirectionNearestFirstPriorityStrategy;
 import biz.jared.strategy.PriorityCalculationStrategy;
 import biz.jared.strategy.RandomDispatchStrategy;
+import biz.jared.strategy.SameDirectionNearestFirstPriorityStrategy;
 
 import static biz.jared.Env.ELEVATOR_NUM;
 import static biz.jared.Env.FLOOR_NUM;
 
 /**
  * App Start
+ * @author jared
  */
 public class App {
 
@@ -41,11 +42,12 @@ public class App {
         //generate all elevator
         List<Elevator> elevatorList = new ArrayList<>(ELEVATOR_NUM);
         for (int i = 0; i < ELEVATOR_NUM; i++) {
-            elevatorList.add(new Elevator(i, floorList.get(0), priorityStrategy));
+            elevatorList.add(new Elevator(i, floorList.get(FLOOR_NUM-1), priorityStrategy));
         }
 
         //make dispatch strategy
         DispatchStrategy dispatchStrategy = new RandomDispatchStrategy();
+        //DispatchStrategy dispatchStrategy = new PriorityFirstDispatchStrategy();
 
         //generate dispatcher
         Dispatcher dispatcher = new Dispatcher(elevatorList, dispatchStrategy);
@@ -69,7 +71,7 @@ public class App {
         //generate all user
         Random random = new Random();
         for (int i = 0; i < USER_NUM; i++) {
-            TimeUnit.SECONDS.sleep(2);
+            TimeUnit.SECONDS.sleep(1);
             //站在什么楼层
             int randomSrcFloorNo = random.nextInt(FLOOR_NUM);
             Floor srcFloor = floorList.get(randomSrcFloorNo);

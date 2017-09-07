@@ -13,4 +13,9 @@ public class Env {
      * 电梯数
      */
     public static final int ELEVATOR_NUM = 3;
+    /**
+     * 最大负载人数
+     */
+    public static final int MAX_LOAD = 2;
+
 }

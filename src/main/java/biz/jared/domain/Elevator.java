@@ -1,12 +1,14 @@
 package biz.jared.domain;
 
 import biz.jared.Calc;
+import biz.jared.Env;
 import biz.jared.domain.enumeration.Direction;
 import biz.jared.domain.enumeration.ElevatorStatus;
 import biz.jared.domain.enumeration.TaskStatus;
 import biz.jared.exception.CannotExecTaskException;
-import biz.jared.exception.TaskGrabbedException;
+import biz.jared.exception.UserInElevatorTaskGrabbedException;
 import biz.jared.exception.TaskCancelledException;
+import biz.jared.exception.UserInFloorTaskGrabbedException;
 import biz.jared.strategy.PriorityCalculationStrategy;
 
 import java.util.HashSet;
@@ -15,6 +17,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static biz.jared.Env.MAX_LOAD;
 
 /**
  * @author jared
@@ -38,10 +42,7 @@ public class Elevator implements Runnable {
      * 当前正在执行的任务
      */
     private Task currTask;
-    /**
-     * 最大负载人数
-     */
-    private static final int MAX_LOAD = 10;
+
     /**
      * 负责调度此电梯的调度器
      */
@@ -63,33 +64,46 @@ public class Elevator implements Runnable {
     }
 
     /**
-     * 接到任务就要尽力去执行（满载、当前任务被抢占才能redispatch），执行的优先级可以自己排
+     * 电梯没权利选择是否接受任务，接到任务只能尽力去执行（满载、当前任务被抢占才能redispatch），但是执行的优先级可以自己排
      *
-     * @param task
+     * @param task 待排期任务
      */
     void receive(Task task) {
-        //当前任务对应楼层的抵达 和当前电梯顺路？   fixme 这段逻辑要移到strategy里去，电梯没权利选择是否接受
-        //boolean inSameDirection =
-        //    status.equals(ElevatorStatus.IDLE) ||
-        //        (currFloor.locate(task.getSrcFloor()).equals(Direction.UP)
-        //            && status.equals(ElevatorStatus.RUNNING_DOWN)) ||
-        //        (currFloor.locate(task.getSrcFloor()).equals(Direction.DOWN)
-        //            && status.equals(ElevatorStatus.RUNNING_UP));
-        //if (!taskQueue.contains(task) && inSameDirection) {
         if (task != null && !taskQueue.contains(task)) {
             try {
                 //定好优先级再放入队列
                 task.setPriority(priorityCalculationStrategy.calcPriority(this, task));
                 taskQueue.put(task);
                 //如果当前任务比电梯正在执行的任务优先级还优先（priority较小，相等都不算），则发生任务抢占
-                if (task.isPriorityHigher(currTask)) {
-                    //改成runnable状态可以让电梯在move的过程中发现已被抢占
+                if (currTask != null && needGrab(task)) {
                     currTask.yield();
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * 是否可以抢占
+     * 重新计算当前任务的优先级，并和当前收到的任务进行比较
+     * @param task
+     * @return
+     */
+    private boolean needGrab(Task task) {
+        int newPriority = tryReceive(currTask);
+        currTask.setPriority(newPriority);
+        return task.isPriorityHigherThan(currTask);
+    }
+
+    /**
+     * 尝试receive task
+     *
+     * @param task
+     * @return 此任务可能的权重
+     */
+    public int tryReceive(Task task) {
+        return priorityCalculationStrategy.calcPriority(this, task);
     }
 
     /**
@@ -101,15 +115,25 @@ public class Elevator implements Runnable {
             Task task = null;
             try {
                 //get task
-                task = taskQueue.take();
+                task = taskQueue.poll(10, TimeUnit.SECONDS);
+                if (task == null) {
+                    throw new InterruptedException();
+                }
                 //execute it
                 execTask(task);
-            } catch (InterruptedException | TaskCancelledException e) {
-                System.out.println(this + " take task error: " + e);
-            } catch (CannotExecTaskException | TaskGrabbedException e) {//不能执行的任务要重新分配
+            } catch (InterruptedException e) {
+                System.out.println(this + " has no task for a long time, so quit...");
+                dispatcher.quit(this);
+                break;
+            } catch (TaskCancelledException e) {//任务被取消
+                System.out.println(this + " task " + task + " has been cancelled ");
+            } catch (CannotExecTaskException | UserInFloorTaskGrabbedException e) {//不能执行的任务要重新分配
                 System.out.println(
                     task + " can not be executed by " + this + " caused by " + e + " so redispatching...");
                 dispatcher.redispatch(task);
+            } catch (UserInElevatorTaskGrabbedException e) {//电梯内用户任务被抢占，只能还是当前电梯处理其任务
+                System.out.println(task + " has been grabbed so delay execute ...");
+                receive(task);
             } finally {
                 //finish, i'm idle
                 onIdle();
@@ -133,7 +157,8 @@ public class Elevator implements Runnable {
      * @throws CannotExecTaskException 执行过程中发现任务无法再执行的情况
      */
     private void execTask(Task task)
-        throws TaskCancelledException, CannotExecTaskException, TaskGrabbedException, InterruptedException {
+        throws TaskCancelledException, CannotExecTaskException, UserInElevatorTaskGrabbedException,
+        InterruptedException, UserInFloorTaskGrabbedException {
         if (task == null) {
             return;
         }
@@ -144,10 +169,10 @@ public class Elevator implements Runnable {
             throw new CannotExecTaskException();
         }
         //在任务执行之前检查已经被取消的任务
-        if (task.getStatus().equals(TaskStatus.CANCELLED)){
+        if (task.getStatus().equals(TaskStatus.CANCELLED)) {
             throw new TaskCancelledException();
         }
-        System.out.println("start to execute " + currTask);
+        System.out.println(this + "start to execute " + currTask);
         //执行
         //1. move currFloor
         move(task);
@@ -174,7 +199,7 @@ public class Elevator implements Runnable {
     private void load(Direction direction) {
         //楼层减少负载
         Set<User> reduceSet = currFloor.reduce(direction, MAX_LOAD - currLoad.size());
-        if (reduceSet.size() > 0) {
+        if (!reduceSet.isEmpty()) {
             //电梯增加负载
             currLoad.addAll(reduceSet);
             System.out.println(this + " loading " + reduceSet.size() + " users:" + reduceSet);
@@ -203,7 +228,9 @@ public class Elevator implements Runnable {
      *
      * @param task
      */
-    private void move(Task task) throws TaskCancelledException, TaskGrabbedException, InterruptedException {
+    private void move(Task task)
+        throws TaskCancelledException, UserInElevatorTaskGrabbedException, InterruptedException,
+        UserInFloorTaskGrabbedException {
         //设置任务状态
         task.setStatus(TaskStatus.RUNNING);
 
@@ -220,7 +247,12 @@ public class Elevator implements Runnable {
             }
             //执行过程中检查，已被抢占的任务停止执行
             if (task.getStatus().equals(TaskStatus.RUNNABLE)) {
-                throw new TaskGrabbedException();
+                //电梯内用户的任务只能在当前电梯任务列表里重新分配，而电梯外用户的任务可以redispatch给其它的电梯，处理方式不同所以抛出不同的异常
+                if (task.getDirection().equals(Direction.NONE)) {
+                    throw new UserInElevatorTaskGrabbedException();
+                } else {
+                    throw new UserInFloorTaskGrabbedException();
+                }
             }
             //楼层移动耗时
             TimeUnit.SECONDS.sleep(1);
@@ -261,5 +293,20 @@ public class Elevator implements Runnable {
 
     public void setDispatcher(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+
+        Elevator elevator = (Elevator)o;
+
+        return id == elevator.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
     }
 }

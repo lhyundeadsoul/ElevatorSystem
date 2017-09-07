@@ -3,6 +3,7 @@ package biz.jared.domain;
 import biz.jared.strategy.DispatchStrategy;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -55,4 +56,15 @@ public class Dispatcher {
         dispatch(task);
     }
 
+    /**
+     * 一个电梯无任务退出
+     * @param elevator
+     */
+    void quit(Elevator elevator){
+        //不用 elevatorList.remove(o) 为了防止产生 concurrent exception
+        Iterator<Elevator> iterator = elevatorList.iterator();
+        while (iterator.hasNext() && iterator.next().equals(elevator)) {
+            iterator.remove();
+        }
+    }
 }

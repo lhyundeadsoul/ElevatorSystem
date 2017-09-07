@@ -81,19 +81,26 @@ public class Floor {
      * @return 减少的人集合
      */
     Set<User> reduce(Direction direction, int num) {
+        Set<User> reduceSet = new HashSet<>(num);
         //准备接走哪一个方向的人，另一个方向的人不能上
-        Set<User> waitingUserSet = direction.equals(Direction.UP) ? waitingUpUserSet : waitingDownUserSet;
-        Set<User> reduceSet;
+        Set<User> waitingUserSet = null;
+        if (direction.equals(Direction.UP)) {
+            waitingUserSet = waitingUpUserSet;
+        } else if (direction.equals(Direction.DOWN)) {
+            waitingUserSet = waitingDownUserSet;
+        }
         //电梯剩余负载大于所有等候人数的情况，全上。否则只上随机的一部分
-        if (num >= waitingUserSet.size()) {
-            reduceSet = waitingUserSet;
-        } else {
-            reduceSet = new HashSet<>(num);
-            Iterator<User> iterator = waitingUserSet.iterator();
-            while (reduceSet.size() < num) {
-                User next = iterator.next();
-                iterator.remove();
-                reduceSet.add(next);
+        if (waitingUserSet != null) {
+            if (num >= waitingUserSet.size()) {
+                reduceSet.addAll(waitingUserSet);
+                waitingUserSet.clear();
+            } else {
+                Iterator<User> iterator = waitingUserSet.iterator();
+                while (reduceSet.size() < num) {
+                    User next = iterator.next();
+                    iterator.remove();
+                    reduceSet.add(next);
+                }
             }
         }
         return reduceSet;

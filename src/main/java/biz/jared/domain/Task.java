@@ -87,17 +87,17 @@ public class Task implements Comparable<Task> {
     @Override
     public int compareTo(Task o) {
         if (o == null) {
-            return 1;
+            return -1;
         }
         return priority - o.priority;
     }
 
     /**
      * 当前任务优先级是否更高
-     * @param task 被比较的任务
      * @return true when current task's priority is higher
+     * @param task
      */
-    boolean isPriorityHigher(Task task) {
+    public boolean isPriorityHigherThan(Task task) {
         return compareTo(task) < 0;
     }
 
@@ -121,10 +121,19 @@ public class Task implements Comparable<Task> {
         return direction == task.direction;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
     @Override
     public int hashCode() {
         int result = srcFloor != null ? srcFloor.hashCode() : 0;
         result = 31 * result + (direction != null ? direction.hashCode() : 0);
         return result;
+
     }
 }
