@@ -1,11 +1,13 @@
 package biz.jared.domain;
 
+import biz.jared.strategy.DispatchStrategy;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import biz.jared.strategy.DispatchStrategy;
 
 /**
  * 多电梯系统的任务总调度器
@@ -21,6 +23,10 @@ public class Dispatcher {
      * 任务分配策略
      */
     private DispatchStrategy dispatchStrategy;
+    /**
+     * 用于异步完成dispatch task
+     */
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public Dispatcher(List<Elevator> elevatorList, DispatchStrategy dispatchStrategy) {
         this.elevatorList = elevatorList;
@@ -32,24 +38,24 @@ public class Dispatcher {
      *
      * @param task
      */
-    Elevator dispatch(Task task) {
+    void dispatch(Task task) {
         if (task == null) {
-            return null;
+            return;
         }
-
-        Elevator elevator;
-        //如果选不出来电梯，就一直重试
-        while ((elevator = dispatchStrategy.select(elevatorList, task)) == null) {
-            try {
-                TimeUnit.SECONDS.sleep(1);
-                System.out.println("all elevator is in max load , retry dispatch...");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        executorService.submit(() -> {
+            Elevator elevator;
+            //如果选不出来电梯，就一直重试
+            while ((elevator = dispatchStrategy.select(elevatorList, task)) == null) {
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                    System.out.println("dispatcher can't select one elevator, maybe all of them are in max load , retry dispatch...");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        System.out.println("dispatch task:" + task + " result: give it to " + elevator);
-        elevator.receive(task);
-        return elevator;
+            System.out.println("dispatch task:" + task + " result: give it to " + elevator);
+            elevator.receive(task);
+        });
     }
 
     void cancel(Task task) {
@@ -76,6 +82,10 @@ public class Dispatcher {
         Iterator<Elevator> iterator = elevatorList.iterator();
         while (iterator.hasNext() && iterator.next().equals(elevator)) {
             iterator.remove();
+        }
+        //无电梯可调度时要shutdown线程池
+        if (elevatorList.isEmpty()) {
+            executorService.shutdownNow();
         }
     }
 }

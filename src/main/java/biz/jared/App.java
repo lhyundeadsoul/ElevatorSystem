@@ -1,10 +1,5 @@
 package biz.jared;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
 import biz.jared.domain.Dispatcher;
 import biz.jared.domain.Elevator;
 import biz.jared.domain.Floor;
@@ -14,11 +9,19 @@ import biz.jared.strategy.PriorityCalculationStrategy;
 import biz.jared.strategy.PriorityFirstDispatchStrategy;
 import biz.jared.strategy.SameDirectionNearestFirstPriorityStrategy;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
 import static biz.jared.Env.ELEVATOR_NUM;
 import static biz.jared.Env.FLOOR_NUM;
 
 /**
  * App Start
+ * 1）可编译，2）可运行，3）可测试，4）可读，5）可维护，6）可重用。
+ * 通过自动化测试的代码只能达到第3）级
+ * 而通过Code Review的代码少会在第4）级甚至更高。
  *
  * @author jared
  */
@@ -63,9 +66,9 @@ public class App {
         elevatorList.forEach(elevator -> new Thread(elevator, "elevator-thread-" + elevator.getId()).start());
 
         //simulation
-        //simulation1u(floorList);
-        simulationNu(floorList);
-//        randomSimulate(floorList);
+//        simulation1u(floorList);
+//        simulationNu(floorList);
+        randomSimulate(floorList);
     }
 
     private static void randomSimulate(List<Floor> floorList) throws InterruptedException {
@@ -87,9 +90,9 @@ public class App {
     }
 
     private static void simulation1u(List<Floor> floorList) throws InterruptedException {
-        Floor srcFloor = floorList.get(4);
+        Floor srcFloor = floorList.get(3);
         //想去什么楼层
-        Floor targetFloor = floorList.get(3);
+        Floor targetFloor = floorList.get(2);
         User user = new User("lucy0", targetFloor);
         System.out.println("src_floorNo=" + srcFloor.getFloorNo() + " " + user);
         srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
@@ -104,17 +107,17 @@ public class App {
         System.out.println("src_floorNo=" + srcFloor.getFloorNo() + " " + user);
         srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
 
-//        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(1);
 
         //user 2
-        Floor srcFloor2 = floorList.get(4);
+        Floor srcFloor2 = floorList.get(2);
         //想去什么楼层
-        Floor targetFloor2 = floorList.get(2);
+        Floor targetFloor2 = floorList.get(4);
         user = new User("lucy1", targetFloor2);
         System.out.println("src_floorNo=" + srcFloor2.getFloorNo() + " " + user);
         srcFloor2.add(user, srcFloor2.locate(targetFloor2).opposite());
 
-//        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(1);
 
         //user 3
         Floor srcFloor3 = floorList.get(1);

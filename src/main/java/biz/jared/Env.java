@@ -2,6 +2,7 @@ package biz.jared;
 
 /**
  * 系统运行依赖的环境参数
+ *
  * @author jared
  * @date 2017/09/06
  */

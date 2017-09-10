@@ -4,7 +4,6 @@ import biz.jared.Calc;
 import biz.jared.Env;
 import biz.jared.domain.Elevator;
 import biz.jared.domain.Task;
-import biz.jared.domain.enumeration.Direction;
 
 /**
  * 同相距离最近优先策略
@@ -22,9 +21,9 @@ public class SameDirectionNearestFirstPriorityStrategy implements PriorityCalcul
      * e = 总楼层数
      * 电梯向上走时的计算逻辑：
      * 1、同相、顺路 -> p = x - y
-     * 2、同相、不顺路 -> p = 2 * e - x + y
+     * 2、同相、不顺路 -> p = 2 * e - y + x
      * 3、不同相 -> p = 2 * e - x - y
-     *
+     * <p>
      * 电梯向下走时的计算逻辑：
      * 1、同相、顺路 -> p = y - x
      * 2、同相、不顺路 -> p = 2 * e - x + y
@@ -48,24 +47,25 @@ public class SameDirectionNearestFirstPriorityStrategy implements PriorityCalcul
             case RUNNING_DOWN:
                 priority = calcPriorityOnRunningDown(x, y, isSameDirection);
                 break;
-            case IDLE://从idle状态被任务带动的电梯，其优先级要按有运动方向
-                priority = Direction.UP.equals(task.getSrcFloor().locate(elevator.getCurrFloor()))
-                        ? calcPriorityOnRunningUp(x, y, isSameDirection)
-                        : calcPriorityOnRunningDown(x,y,isSameDirection);
+            case IDLE:
+//                priority = Direction.UP.equals(task.getSrcFloor().locate(elevator.getCurrFloor()))
+//                        ? calcPriorityOnRunningUp(x, y, isSameDirection)
+//                        : calcPriorityOnRunningDown(x, y, isSameDirection);
+                priority = Math.abs(x - y);
                 break;
             default:
                 throw new IllegalArgumentException();
         }
         //priority已经是2倍楼层总数了，优先级要循环
-        if (priority == MAX_PRIORITY) {
-            priority = 0;
-        }
+//        if (priority == MAX_PRIORITY) {
+//            priority = 0;
+//        }
         return priority;
     }
 
     private int calcPriorityOnRunningDown(int x, int y, boolean isSameDirection) {
         int priority;
-        boolean isOnTheWay = y > x;
+        boolean isOnTheWay = y >= x;
         if (isOnTheWay && isSameDirection) {
             priority = y - x;
         } else if (!isOnTheWay && isSameDirection) {
@@ -77,12 +77,12 @@ public class SameDirectionNearestFirstPriorityStrategy implements PriorityCalcul
     }
 
     private int calcPriorityOnRunningUp(int x, int y, boolean isSameDirection) {
-        boolean isOnTheWay = x > y;
+        boolean isOnTheWay = x >= y;
         int priority;
         if (isOnTheWay && isSameDirection) {
             priority = x - y;
         } else if (!isOnTheWay && isSameDirection) {
-            priority = MAX_PRIORITY - x + y;
+            priority = MAX_PRIORITY - y + x;
         } else {
             priority = MAX_PRIORITY - x - y;
         }

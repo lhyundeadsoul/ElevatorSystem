@@ -44,17 +44,21 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-            "name='" + name + '\'' +
-            ", targetFloor=" + targetFloor.getFloorNo() +
-            '}';
+                "name='" + name + '\'' +
+                ", targetFloor=" + targetFloor.getFloorNo() +
+                '}';
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-        User user = (User)o;
+        User user = (User) o;
 
         return name.equals(user.name);
     }

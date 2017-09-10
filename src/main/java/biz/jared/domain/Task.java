@@ -1,9 +1,9 @@
 package biz.jared.domain;
 
-import java.util.Random;
-
 import biz.jared.domain.enumeration.Direction;
 import biz.jared.domain.enumeration.TaskStatus;
+
+import java.util.Random;
 
 /**
  * @author jared
@@ -70,14 +70,13 @@ public class Task implements Comparable<Task> {
     @Override
     public String toString() {
         return "Task{" +
-            "id=" + id +
-            ", src floor=" + srcFloor.getFloorNo() +
-            ", direction=" + direction +
-            '}';
+                "id=" + id +
+                ", src floor=" + srcFloor.getFloorNo() +
+                ", direction=" + direction +
+                '}';
     }
 
     void setPriority(int priority) {
-        System.out.println("--------"+this+"  "+priority);
         this.priority = priority;
     }
 
@@ -110,13 +109,17 @@ public class Task implements Comparable<Task> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-        Task task = (Task)o;
-
+        Task task = (Task) o;
+        //NONE方向的任务和所有方向的任务都equal
         return (srcFloor != null ? srcFloor.equals(task.srcFloor) : task.srcFloor == null)
-            && direction == task.direction;
+                && (direction.equals(task.direction) || direction.equals(Direction.NONE) || task.direction.equals(Direction.NONE));
     }
 
     @Override

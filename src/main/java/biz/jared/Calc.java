@@ -22,7 +22,9 @@ public class Calc {
     }
 
     /**
-     * 是否任务和电梯同相（任务方向是NONE也算）
+     * 是否任务和电梯同相
+     * 因为用户一定会选一个与电梯相同方向的任务，所以任务方向是NONE也算
+     * 电梯
      *
      * @param elevator
      * @param task
@@ -30,8 +32,9 @@ public class Calc {
      */
     public static boolean isSameDirection(Elevator elevator, Task task) {
         return (elevator.getStatus().equals(ElevatorStatus.RUNNING_UP) && task.getDirection().equals(Direction.UP))
-            || (elevator.getStatus().equals(ElevatorStatus.RUNNING_DOWN) && task.getDirection().equals(Direction.DOWN))
-            || task.getDirection().equals(Direction.NONE);
+                || (elevator.getStatus().equals(ElevatorStatus.RUNNING_DOWN) && task.getDirection().equals(Direction.DOWN))
+                || task.getDirection().equals(Direction.NONE)
+                || elevator.getStatus().equals(ElevatorStatus.IDLE);
     }
 
 }

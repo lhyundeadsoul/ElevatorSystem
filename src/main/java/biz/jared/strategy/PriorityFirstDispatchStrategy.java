@@ -1,9 +1,9 @@
 package biz.jared.strategy;
 
-import java.util.List;
-
 import biz.jared.domain.Elevator;
 import biz.jared.domain.Task;
+
+import java.util.List;
 
 import static biz.jared.Env.MAX_LOAD;
 
@@ -20,7 +20,7 @@ public class PriorityFirstDispatchStrategy implements DispatchStrategy {
         int priority = Integer.MAX_VALUE;
         Elevator best = null;
         for (Elevator elevator : elevatorList) {
-            if (elevator.getCurrLoad().size()==MAX_LOAD){
+            if (elevator.getCurrLoad().size() == MAX_LOAD) {
                 continue;
             }
             int possiblePriority = elevator.tryReceive(task);

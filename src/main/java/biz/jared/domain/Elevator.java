@@ -1,12 +1,5 @@
 package biz.jared.domain;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
 import biz.jared.Calc;
 import biz.jared.domain.enumeration.Direction;
 import biz.jared.domain.enumeration.ElevatorStatus;
@@ -16,6 +9,17 @@ import biz.jared.exception.TaskCancelledException;
 import biz.jared.exception.UserInElevatorTaskGrabbedException;
 import biz.jared.exception.UserInFloorTaskGrabbedException;
 import biz.jared.strategy.PriorityCalculationStrategy;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 import static biz.jared.Env.MAX_LOAD;
 
@@ -54,6 +58,10 @@ public class Elevator implements Runnable {
      * 任务优先级计算策略
      */
     private PriorityCalculationStrategy priorityCalculationStrategy;
+    /**
+     * 用于锁楼层（在读取楼层并做任务优先的决策时，不能改楼层数据）
+     */
+    private ReadWriteLock rwLock = new ReentrantReadWriteLock();
 
     public Elevator(int id, Floor initFloor, PriorityCalculationStrategy priorityCalculationStrategy) {
         this.id = id;
@@ -68,19 +76,47 @@ public class Elevator implements Runnable {
      * @param task 待排期任务
      */
     void receive(Task task) {
-        if (task != null && !taskQueue.contains(task)) {
-            try {
-                //定好优先级再放入队列
-                task.setPriority(priorityCalculationStrategy.calcPriority(this, task));
-                taskQueue.put(task);
+        rwLock.readLock().lock();
+        try {
+            if (task != null && !taskQueue.contains(task)) {
+                //接收新任务前重新计算所有任务的优先级
+                updateAllTaskPriorityOnReceive();
+                //当前定好优先级再放入队列
+                doReceive(task);
                 //如果当前任务比电梯正在执行的任务优先级还优先（priority较小，相等都不算），则发生任务抢占
                 if (currTask != null && needGrab(task)) {
+                    System.out.println("========" + task + " grab " + currTask);
                     currTask.yield();
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
+        } finally {
+            rwLock.readLock().unlock();
         }
+    }
+
+    /**
+     * 计算任务优先级，然后放入优先队列
+     *
+     * @param task 要入队的任务
+     */
+    private void doReceive(Task task) {
+        int priority = tryReceive(task);
+        task.setPriority(priority);
+        System.out.println("--------get receive task " + task + " p " + priority);
+        try {
+            taskQueue.put(task);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 当接收任务时，更新所有任务列表里的任务优先级
+     */
+    private void updateAllTaskPriorityOnReceive() {
+        Collection<Task> tempTaskList = new ArrayList<>();
+        taskQueue.drainTo(tempTaskList);
+        tempTaskList.forEach(this::doReceive);
     }
 
     /**
@@ -93,6 +129,7 @@ public class Elevator implements Runnable {
     private boolean needGrab(Task task) {
         int newPriority = tryReceive(currTask);
         currTask.setPriority(newPriority);
+        System.out.println("--------update current " + currTask + " p " + newPriority);
         return task.isPriorityHigherThan(currTask);
     }
 
@@ -122,14 +159,14 @@ public class Elevator implements Runnable {
                 //execute it
                 execTask(task);
             } catch (InterruptedException e) {
-                System.out.println(this + " has no task for a long time, so quit...");
                 dispatcher.quit(this);
+                System.out.println(this + " has no task for a long time, so quit...");
                 break;
             } catch (TaskCancelledException e) {//任务被取消
                 System.out.println(this + " task " + task + " has been cancelled ");
             } catch (CannotExecTaskException | UserInFloorTaskGrabbedException e) {//不能执行的任务要重新分配
                 System.out.println(
-                    task + " can not be executed by " + this + " caused by " + e + " so redispatching...");
+                        task + " can not be executed by " + this + " caused by " + e.getClass().getName() + " so redispatching...");
                 dispatcher.redispatch(task);
             } catch (UserInElevatorTaskGrabbedException e) {//电梯内用户任务被抢占，只能还是当前电梯处理其任务
                 System.out.println(task + " has been grabbed so delay execute ...");
@@ -153,12 +190,12 @@ public class Elevator implements Runnable {
      * 执行任务逻辑
      *
      * @param task 待执行的任务
-     * @throws TaskCancelledException 执行过程中任务被取消的情况
+     * @throws TaskCancelledException  执行过程中任务被取消的情况
      * @throws CannotExecTaskException 执行过程中发现任务无法再执行的情况
      */
     private void execTask(Task task)
-        throws TaskCancelledException, CannotExecTaskException, UserInElevatorTaskGrabbedException,
-        InterruptedException, UserInFloorTaskGrabbedException {
+            throws TaskCancelledException, CannotExecTaskException, UserInElevatorTaskGrabbedException,
+            InterruptedException, UserInFloorTaskGrabbedException {
         if (task == null) {
             return;
         }
@@ -172,7 +209,7 @@ public class Elevator implements Runnable {
         if (task.getStatus().equals(TaskStatus.CANCELLED)) {
             throw new TaskCancelledException();
         }
-        System.out.println(this + "start to execute " + currTask);
+        System.out.println(this + " start to execute " + currTask);
         //执行
         //1. move currFloor
         move(task);
@@ -214,8 +251,8 @@ public class Elevator implements Runnable {
     private void unload() {
         //获取已经到目标楼层的人
         Set<User> unloadSet = currLoad.stream()
-            .filter(user -> user.getTargetFloor().equals(currFloor))
-            .collect(Collectors.toSet());
+                .filter(user -> user.getTargetFloor().equals(currFloor))
+                .collect(Collectors.toSet());
         if (unloadSet.size() > 0) {
             //卸载掉
             currLoad.removeAll(unloadSet);
@@ -229,8 +266,8 @@ public class Elevator implements Runnable {
      * @param task
      */
     private void move(Task task)
-        throws TaskCancelledException, UserInElevatorTaskGrabbedException, InterruptedException,
-        UserInFloorTaskGrabbedException {
+            throws TaskCancelledException, UserInElevatorTaskGrabbedException, InterruptedException,
+            UserInFloorTaskGrabbedException {
         //设置任务状态
         task.setStatus(TaskStatus.RUNNING);
 
@@ -254,10 +291,9 @@ public class Elevator implements Runnable {
                     throw new UserInFloorTaskGrabbedException();
                 }
             }
-            //楼层移动耗时
+            //一定要先改变电梯的当前楼层，再楼层移动耗时。原因：当电梯门关上后，刚刚开始启动，这时即使还没到下一层楼，也要按下一层楼算了，因为当前楼层已经没机会上了，这和现实也是符合的
+            setCurrFloor(currFloor.next(relativeDirection));
             TimeUnit.SECONDS.sleep(1);
-            //改变电梯的当前楼层
-            currFloor = currFloor.next(relativeDirection);
             System.out.println(this + " moving:  " + getStatus());
         }
     }
@@ -265,10 +301,10 @@ public class Elevator implements Runnable {
     @Override
     public String toString() {
         return "Elevator{" +
-            "id=" + id +
-            ", currFloor=" + currFloor.getFloorNo() +
-            ", currLoad=" + currLoad +
-            '}';
+                "id=" + id +
+                ", currFloor=" + currFloor.getFloorNo() +
+                ", currLoad=" + currLoad +
+                '}';
     }
 
     public int getId() {
@@ -287,7 +323,14 @@ public class Elevator implements Runnable {
         return currFloor;
     }
 
-    public void setCurrTask(Task currTask) {
+    private void setCurrFloor(Floor currFloor) {
+        //有人读的时候不能写
+        rwLock.writeLock().lock();
+        this.currFloor = currFloor;
+        rwLock.writeLock().unlock();
+    }
+
+    private void setCurrTask(Task currTask) {
         this.currTask = currTask;
     }
 
@@ -301,10 +344,14 @@ public class Elevator implements Runnable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-        Elevator elevator = (Elevator)o;
+        Elevator elevator = (Elevator) o;
 
         return id == elevator.id;
     }

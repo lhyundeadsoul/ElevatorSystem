@@ -1,10 +1,10 @@
 package biz.jared.strategy;
 
-import java.util.List;
-import java.util.Random;
-
 import biz.jared.domain.Elevator;
 import biz.jared.domain.Task;
+
+import java.util.List;
+import java.util.Random;
 
 /**
  * 随机分配电梯策略

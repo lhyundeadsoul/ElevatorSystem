@@ -1,12 +1,8 @@
 package biz.jared.domain;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import biz.jared.domain.enumeration.Direction;
+
+import java.util.*;
 
 /**
  * @author jared
@@ -137,8 +133,8 @@ public class Floor {
     @Override
     public String toString() {
         return "Floor{" +
-            "floorNo=" + floorNo +
-            '}';
+                "floorNo=" + floorNo +
+                '}';
     }
 
     public void setDispatcher(Dispatcher dispatcher) {
@@ -154,7 +150,7 @@ public class Floor {
             return false;
         }
 
-        Floor floor = (Floor)o;
+        Floor floor = (Floor) o;
 
         return floorNo == floor.floorNo;
     }
