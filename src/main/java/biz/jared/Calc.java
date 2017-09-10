@@ -24,7 +24,7 @@ public class Calc {
     /**
      * 是否任务和电梯同相
      * 因为用户一定会选一个与电梯相同方向的任务，所以任务方向是NONE也算
-     * 电梯
+     * 电梯idle和所有方向算同相
      *
      * @param elevator
      * @param task
