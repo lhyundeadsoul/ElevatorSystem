@@ -79,10 +79,7 @@ public class Dispatcher {
      */
     void quit(Elevator elevator) {
         //不用 elevatorList.remove(o) 为了防止产生 concurrent exception
-        Iterator<Elevator> iterator = elevatorList.iterator();
-        while (iterator.hasNext() && iterator.next().equals(elevator)) {
-            iterator.remove();
-        }
+        elevatorList.removeIf(elevator1 -> elevator1.equals(elevator));
         //无电梯可调度时要shutdown线程池
         if (elevatorList.isEmpty()) {
             executorService.shutdownNow();

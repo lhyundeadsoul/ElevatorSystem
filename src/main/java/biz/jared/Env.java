@@ -10,14 +10,14 @@ public class Env {
     /**
      * 总楼层数
      */
-    public static final int FLOOR_NUM = 5;
+    public static final int FLOOR_NUM = 10;
     /**
      * 电梯数
      */
-    public static final int ELEVATOR_NUM = 1;
+    public static final int ELEVATOR_NUM = 2;
     /**
      * 最大负载人数
      */
-    public static final int MAX_LOAD = 1;
+    public static final int MAX_LOAD = 3;
 
 }

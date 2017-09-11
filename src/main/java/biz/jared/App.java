@@ -27,7 +27,7 @@ import static biz.jared.Env.FLOOR_NUM;
  */
 public class App {
 
-    private static final int USER_NUM = 3;
+    private static final int USER_NUM = 1;
 
     public static void main(String[] args) throws InterruptedException {
         //generate all floor
