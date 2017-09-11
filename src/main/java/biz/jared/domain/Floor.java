@@ -1,6 +1,8 @@
 package biz.jared.domain;
 
 import biz.jared.domain.enumeration.Direction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 

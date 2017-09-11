@@ -2,6 +2,8 @@ package biz.jared.domain;
 
 import biz.jared.domain.enumeration.Direction;
 import biz.jared.domain.enumeration.TaskStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
@@ -22,6 +24,7 @@ public class Task implements Comparable<Task> {
     private TaskStatus status;
 
     private int priority;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Task.class);
 
     private Task(int id, Floor srcFloor, Direction direction) {
         this.id = id;
@@ -48,7 +51,7 @@ public class Task implements Comparable<Task> {
      */
     void cancel() {
         setStatus(TaskStatus.CANCELLED);
-        System.out.println(this + " cancelled");
+        LOGGER.info("{} cancelled", this);
     }
 
     public Floor getSrcFloor() {

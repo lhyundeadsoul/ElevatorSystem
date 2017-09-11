@@ -1,13 +1,14 @@
 package biz.jared.domain;
 
-import biz.jared.strategy.DispatchStrategy;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import biz.jared.strategy.DispatchStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 多电梯系统的任务总调度器
@@ -27,6 +28,8 @@ public class Dispatcher {
      * 用于异步完成dispatch task
      */
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Dispatcher.class);
 
     public Dispatcher(List<Elevator> elevatorList, DispatchStrategy dispatchStrategy) {
         this.elevatorList = elevatorList;
@@ -48,12 +51,13 @@ public class Dispatcher {
             while ((elevator = dispatchStrategy.select(elevatorList, task)) == null) {
                 try {
                     TimeUnit.SECONDS.sleep(1);
-                    System.out.println("dispatcher can't select one elevator, maybe all of them are in max load , retry dispatch...");
+                    LOGGER.warn(
+                        "dispatcher can't select one elevator, maybe all of them are in max load , retry dispatch...");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            System.out.println("dispatch task:" + task + " result: give it to " + elevator);
+            LOGGER.info("dispatch task:{} result: give it to {}", task, elevator);
             elevator.receive(task);
         });
     }
@@ -68,7 +72,7 @@ public class Dispatcher {
      * @param task
      */
     void redispatch(Task task) {
-        System.out.println("Redispatch task:" + task);
+        LOGGER.info("Redispatch task:{}", task);
         dispatch(task);
     }
 

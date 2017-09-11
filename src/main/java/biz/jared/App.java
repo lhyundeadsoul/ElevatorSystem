@@ -8,6 +8,8 @@ import biz.jared.strategy.DispatchStrategy;
 import biz.jared.strategy.PriorityCalculationStrategy;
 import biz.jared.strategy.PriorityFirstDispatchStrategy;
 import biz.jared.strategy.SameDirectionNearestFirstPriorityStrategy;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,8 @@ import static biz.jared.Env.FLOOR_NUM;
  */
 public class App {
 
-    private static final int USER_NUM = 1;
+    private static final int USER_NUM = 13;
+    private static Logger LOGGER = LogManager.getLogger();
 
     public static void main(String[] args) throws InterruptedException {
         //generate all floor
@@ -83,6 +86,7 @@ public class App {
             Floor targetFloor = floorList.get(differentFloorNo(randomSrcFloorNo));
             User user = new User("lucy" + i, targetFloor);
             System.out.println("src_floorNo=" + srcFloor.getFloorNo() + " " + user);
+            LOGGER.info("{} come to src_floorNo={}",user,srcFloor.getFloorNo());
             //srcFloor.locate(targetFloor).opposite()，结果Direction一定是对的，但是这里也支持传错的，也符合实际
             srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
             //srcFloor.add(user, Direction.DOWN);

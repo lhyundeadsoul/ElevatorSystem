@@ -1,6 +1,8 @@
 package biz.jared.domain;
 
 import biz.jared.domain.enumeration.Direction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jared
@@ -16,6 +18,7 @@ public class User {
      * 目标楼层
      */
     private Floor targetFloor;
+    private static final Logger LOGGER = LoggerFactory.getLogger(User.class);
 
     public User(String name, Floor targetFloor) {
         this.name = name;
@@ -29,7 +32,7 @@ public class User {
      */
     void select(Floor targetFloor) {
         Task task = Task.generate(targetFloor, Direction.NONE);
-        System.out.println(this + " select " + targetFloor + " create " + task);
+        LOGGER.info("{} select {} create {}", this, targetFloor, task);
         elevator.receive(task);
     }
 

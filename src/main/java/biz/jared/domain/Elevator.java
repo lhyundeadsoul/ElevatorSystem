@@ -1,15 +1,5 @@
 package biz.jared.domain;
 
-import biz.jared.Calc;
-import biz.jared.domain.enumeration.Direction;
-import biz.jared.domain.enumeration.ElevatorStatus;
-import biz.jared.domain.enumeration.TaskStatus;
-import biz.jared.exception.CannotExecTaskException;
-import biz.jared.exception.TaskCancelledException;
-import biz.jared.exception.UserInElevatorTaskGrabbedException;
-import biz.jared.exception.UserInFloorTaskGrabbedException;
-import biz.jared.strategy.PriorityCalculationStrategy;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -20,6 +10,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
+
+import biz.jared.Calc;
+import biz.jared.domain.enumeration.Direction;
+import biz.jared.domain.enumeration.ElevatorStatus;
+import biz.jared.domain.enumeration.TaskStatus;
+import biz.jared.exception.CannotExecTaskException;
+import biz.jared.exception.TaskCancelledException;
+import biz.jared.exception.UserInElevatorTaskGrabbedException;
+import biz.jared.exception.UserInFloorTaskGrabbedException;
+import biz.jared.strategy.PriorityCalculationStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static biz.jared.Env.MAX_LOAD;
 
@@ -62,6 +64,7 @@ public class Elevator implements Runnable {
      * 用于锁楼层（在读取楼层并做任务优先的决策时，不能改楼层数据）
      */
     private ReadWriteLock rwLock = new ReentrantReadWriteLock();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Elevator.class);
 
     public Elevator(int id, Floor initFloor, PriorityCalculationStrategy priorityCalculationStrategy) {
         this.id = id;
@@ -85,7 +88,7 @@ public class Elevator implements Runnable {
                 doReceive(task);
                 //如果当前任务比电梯正在执行的任务优先级还优先（priority较小，相等都不算），则发生任务抢占
                 if (currTask != null && needGrab(task)) {
-                    System.out.println("========" + task + " grab " + currTask);
+                    LOGGER.trace("{} grab {}", task, currFloor);
                     currTask.yield();
                 }
             }
@@ -102,7 +105,7 @@ public class Elevator implements Runnable {
     private void doReceive(Task task) {
         int priority = tryReceive(task);
         task.setPriority(priority);
-        System.out.println("--------get receive task " + task + " p " + priority);
+        LOGGER.trace("get receive task {} priority {}", task, priority);
         try {
             taskQueue.put(task);
         } catch (InterruptedException e) {
@@ -129,7 +132,7 @@ public class Elevator implements Runnable {
     private boolean needGrab(Task task) {
         int newPriority = tryReceive(currTask);
         currTask.setPriority(newPriority);
-        System.out.println("--------update current " + currTask + " p " + newPriority);
+        LOGGER.trace("update current {} priority {}" ,currTask, newPriority);
         return task.isPriorityHigherThan(currTask);
     }
 
@@ -160,16 +163,15 @@ public class Elevator implements Runnable {
                 execTask(task);
             } catch (InterruptedException e) {
                 dispatcher.quit(this);
-                System.out.println(this + " has no task for a long time, so quit...");
+                LOGGER.error("{} has no task for a long time, so quit...", this);
                 break;
             } catch (TaskCancelledException e) {//任务被取消
-                System.out.println(this + " task " + task + " has been cancelled ");
+                LOGGER.error("{} task {} has been cancelled", this, task);
             } catch (CannotExecTaskException | UserInFloorTaskGrabbedException e) {//不能执行的任务要重新分配
-                System.out.println(
-                        task + " can not be executed by " + this + " caused by " + e.getClass().getName() + " so redispatching...");
+                LOGGER.error("{} can not be executed by {} caused by {} so re-dispatching...", task, this, e);
                 dispatcher.redispatch(task);
             } catch (UserInElevatorTaskGrabbedException e) {//电梯内用户任务被抢占，只能还是当前电梯处理其任务
-                System.out.println(task + " has been grabbed so delay execute ...");
+                LOGGER.error("{} has been grabbed so delay execute ...", task);
                 receive(task);
             } finally {
                 //finish, i'm idle
@@ -190,12 +192,12 @@ public class Elevator implements Runnable {
      * 执行任务逻辑
      *
      * @param task 待执行的任务
-     * @throws TaskCancelledException  执行过程中任务被取消的情况
+     * @throws TaskCancelledException 执行过程中任务被取消的情况
      * @throws CannotExecTaskException 执行过程中发现任务无法再执行的情况
      */
     private void execTask(Task task)
-            throws TaskCancelledException, CannotExecTaskException, UserInElevatorTaskGrabbedException,
-            InterruptedException, UserInFloorTaskGrabbedException {
+        throws TaskCancelledException, CannotExecTaskException, UserInElevatorTaskGrabbedException,
+        InterruptedException, UserInFloorTaskGrabbedException {
         if (task == null) {
             return;
         }
@@ -209,7 +211,7 @@ public class Elevator implements Runnable {
         if (task.getStatus().equals(TaskStatus.CANCELLED)) {
             throw new TaskCancelledException();
         }
-        System.out.println(this + " start to execute " + currTask);
+        LOGGER.info("{} start to execute {}", this, currTask);
         //执行
         //1. move currFloor
         move(task);
@@ -239,7 +241,7 @@ public class Elevator implements Runnable {
         if (!reduceSet.isEmpty()) {
             //电梯增加负载
             currLoad.addAll(reduceSet);
-            System.out.println(this + " loading " + reduceSet.size() + " users:" + reduceSet);
+            LOGGER.info("{} loading {} users: {}", this,reduceSet.size(), reduceSet);
             //每个上电梯的人都按一下想去的楼层
             reduceSet.forEach(user -> {
                 user.enterElevator(this);
@@ -251,12 +253,12 @@ public class Elevator implements Runnable {
     private void unload() {
         //获取已经到目标楼层的人
         Set<User> unloadSet = currLoad.stream()
-                .filter(user -> user.getTargetFloor().equals(currFloor))
-                .collect(Collectors.toSet());
+            .filter(user -> user.getTargetFloor().equals(currFloor))
+            .collect(Collectors.toSet());
         if (unloadSet.size() > 0) {
             //卸载掉
             currLoad.removeAll(unloadSet);
-            System.out.println(this + " unloading " + unloadSet.size() + " users:" + unloadSet);
+            LOGGER.info("{} unloading {} users:{}", this, unloadSet.size(), unloadSet);
         }
     }
 
@@ -266,8 +268,8 @@ public class Elevator implements Runnable {
      * @param task
      */
     private void move(Task task)
-            throws TaskCancelledException, UserInElevatorTaskGrabbedException, InterruptedException,
-            UserInFloorTaskGrabbedException {
+        throws TaskCancelledException, UserInElevatorTaskGrabbedException, InterruptedException,
+        UserInFloorTaskGrabbedException {
         //设置任务状态
         task.setStatus(TaskStatus.RUNNING);
 
@@ -294,17 +296,17 @@ public class Elevator implements Runnable {
             //一定要先改变电梯的当前楼层，再楼层移动耗时。原因：当电梯门关上后，刚刚开始启动，这时即使还没到下一层楼，也要按下一层楼算了，因为当前楼层已经没机会上了，这和现实也是符合的
             setCurrFloor(currFloor.next(relativeDirection));
             TimeUnit.SECONDS.sleep(1);
-            System.out.println(this + " moving:  " + getStatus());
+            LOGGER.info("{} moving {}", this, getStatus());
         }
     }
 
     @Override
     public String toString() {
         return "Elevator{" +
-                "id=" + id +
-                ", currFloor=" + currFloor.getFloorNo() +
-                ", currLoad=" + currLoad +
-                '}';
+            "id=" + id +
+            ", currFloor=" + currFloor.getFloorNo() +
+            ", currLoad=" + currLoad +
+            '}';
     }
 
     public int getId() {
@@ -351,7 +353,7 @@ public class Elevator implements Runnable {
             return false;
         }
 
-        Elevator elevator = (Elevator) o;
+        Elevator elevator = (Elevator)o;
 
         return id == elevator.id;
     }
