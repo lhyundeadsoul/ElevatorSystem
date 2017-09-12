@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
+import biz.jared.Env;
 import biz.jared.strategy.DispatchStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,13 +48,9 @@ public class Dispatcher {
             Elevator elevator;
             //如果选不出来电梯，就一直重试
             while ((elevator = dispatchStrategy.select(elevatorList, task)) == null) {
-                try {
-                    TimeUnit.SECONDS.sleep(1);
-                    LOGGER.warn(
-                        "dispatcher can't select one elevator, maybe all of them are in max load , retry dispatch...");
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                Env.elapsed();
+                LOGGER.warn(
+                    "dispatcher can't select one elevator, maybe all of them are in max load , retry dispatch...");
             }
             LOGGER.info("dispatch task:{} result: give it to {}", task, elevator);
             elevator.receive(task);
@@ -81,11 +77,12 @@ public class Dispatcher {
      * @param elevator
      */
     void quit(Elevator elevator) {
-        //不用 elevatorList.remove(o) 为了防止产生 concurrent exception
-        elevatorList.removeIf(elevator1 -> elevator1.equals(elevator));
+        //fixme Exception in thread "elevator-thread-0" java.util.ConcurrentModificationException
+        elevatorList.removeIf(e -> e.equals(elevator));
         //无电梯可调度时要shutdown线程池
         if (elevatorList.isEmpty()) {
-            executorService.shutdownNow();
+            executorService.shutdown();
         }
+        Env.LATCH.countDown();
     }
 }

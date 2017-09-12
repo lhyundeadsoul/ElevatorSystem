@@ -3,8 +3,10 @@
 <Configuration status="off" monitorInterval="1800">
 
     <properties>
-        <property name="LOG_HOME">/Users/jared/logs/elevator-system/</property>
+        <property name="LOG_HOME">${sys:user.home}/logs/elevator-system/</property>
         <property name="ERROR_LOG_FILE_NAME">error</property>
+        <property name="RUN_LOG_FILE_NAME">run</property>
+        <property name="ELAPSE_LOG_FILE_NAME">elapse</property>
     </properties>
 
 
@@ -12,6 +14,30 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d %-5p (%F:%L) - %m%n"/>
         </Console>
+
+        <RollingRandomAccessFile name="ElapseLog"
+                                 fileName="${LOG_HOME}/${ELAPSE_LOG_FILE_NAME}.log"
+                                 filePattern="${LOG_HOME}/${ELAPSE_LOG_FILE_NAME}.log.%d{yyyy-MM-dd}.gz">
+            <PatternLayout
+                    pattern="%d %-5p (%F:%L) - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+
+        <RollingRandomAccessFile name="RunLog"
+                                 fileName="${LOG_HOME}/${RUN_LOG_FILE_NAME}.log"
+                                 filePattern="${LOG_HOME}/${RUN_LOG_FILE_NAME}.log.%d{yyyy-MM-dd}.gz">
+            <PatternLayout
+                    pattern="%d %-5p (%F:%L) - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
 
         <RollingRandomAccessFile name="ErrorLog"
                                  fileName="${LOG_HOME}/${ERROR_LOG_FILE_NAME}.log"
@@ -27,15 +53,16 @@
     </Appenders>
 
     <Loggers>
-        <!-- 3rdparty Loggers -->
-        <!--<logger name="org.springframework.core" level="info">
-        </logger>-->
-
-        <logger name="biz.jared" level="info" includeLocation="true" additivity="false">
-            <appender-ref ref="ErrorLog"/>
+        <logger name="biz.jared.App" level="info">
+            <appender-ref ref="ElapseLog"/>
+        </logger>
+        <logger name="biz.jared.Env" level="info">
+            <appender-ref ref="ElapseLog"/>
+        </logger>
+        <logger name="biz.jared" level="debug" includeLocation="true" additivity="false">
+            <appender-ref ref="RunLog"/>
             <appender-ref ref="Console"/>
         </logger>
-
         <root level="info" includeLocation="true">
             <appender-ref ref="Console"/>
         </root>

@@ -1,6 +1,8 @@
 package biz.jared.domain;
 
+import biz.jared.Env;
 import biz.jared.domain.enumeration.Direction;
+import com.google.common.base.Stopwatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +21,10 @@ public class User {
      * 目标楼层
      */
     private Floor targetFloor;
+    /**
+     * 计时器对等待时间计时
+     */
+    private Stopwatch stopwatch = Stopwatch.createUnstarted();
 
     public User(String name, Floor targetFloor) {
         this.name = name;
@@ -37,7 +43,11 @@ public class User {
     }
 
     void enterElevator(Elevator elevator) {
+        //进入电梯
         this.elevator = elevator;
+        //总等待时间增加
+        long elapsed = stopwatch.stop().elapsed(Env.TIME_UNIT);
+        Env.TOTAL_USER_WAIT_TIME.addAndGet(elapsed);
     }
 
     Floor getTargetFloor() {
@@ -62,12 +72,15 @@ public class User {
         }
 
         User user = (User)o;
-
         return name.equals(user.name);
     }
 
     @Override
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public Stopwatch getStopwatch() {
+        return stopwatch;
     }
 }

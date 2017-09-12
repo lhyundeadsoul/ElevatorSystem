@@ -6,12 +6,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 import biz.jared.Calc;
+import biz.jared.Env;
 import biz.jared.domain.enumeration.Direction;
 import biz.jared.domain.enumeration.ElevatorStatus;
 import biz.jared.domain.enumeration.TaskStatus;
@@ -154,7 +154,7 @@ public class Elevator implements Runnable {
             Task task = null;
             try {
                 //get task
-                task = taskQueue.poll(10, TimeUnit.SECONDS);
+                task = taskQueue.poll(10 * Env.ELAPSED_TIME, Env.TIME_UNIT);
                 if (task == null) {
                     throw new InterruptedException();
                 }
@@ -162,16 +162,18 @@ public class Elevator implements Runnable {
                 execTask(task);
             } catch (InterruptedException e) {
                 dispatcher.quit(this);
-                LOGGER.error("{} has no task for a long time, so quit...", this);
+                LOGGER.warn("{} has no task for a long time, so quit...", this);
                 break;
             } catch (TaskCancelledException e) {//任务被取消
-                LOGGER.error("{} task {} has been cancelled", this, task);
+                LOGGER.warn("{} task {} has been cancelled", this, task);
             } catch (CannotExecTaskException | UserInFloorTaskGrabbedException e) {//不能执行的任务要重新分配
-                LOGGER.error("{} can not be executed by {} caused by {} so re-dispatching...", task, this, e);
+                LOGGER.warn("{} can not be executed by {} caused by {} so re-dispatching...", task, this, e);
                 dispatcher.redispatch(task);
             } catch (UserInElevatorTaskGrabbedException e) {//电梯内用户任务被抢占，只能还是当前电梯处理其任务
-                LOGGER.error("{} has been grabbed so delay execute ...", task);
+                LOGGER.warn("{} has been grabbed so delay execute ...", task);
                 receive(task);
+            } catch (Throwable e) {//其它情况
+                LOGGER.error("unknown error:",e);
             } finally {
                 //finish, i'm idle
                 onIdle();
@@ -294,7 +296,9 @@ public class Elevator implements Runnable {
             }
             //一定要先改变电梯的当前楼层，再楼层移动耗时。原因：当电梯门关上后，刚刚开始启动，这时即使还没到下一层楼，也要按下一层楼算了，因为当前楼层已经没机会上了，这和现实也是符合的
             setCurrFloor(currFloor.next(relativeDirection));
-            TimeUnit.SECONDS.sleep(1);
+            Env.elapsed();
+            //电梯运行总里程+1
+            Env.TOTAL_ELEVATOR_MOVE_DISTANCE.incrementAndGet();
             LOGGER.info("{} moving {}", this, getStatus());
         }
     }

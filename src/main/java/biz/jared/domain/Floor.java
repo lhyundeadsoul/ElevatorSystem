@@ -60,6 +60,7 @@ public class Floor {
      * @param user
      */
     public void add(User user, Direction direction) {
+        //给相应方向上的等待队列加用户
         if (direction.equals(Direction.UP)) {
             waitingUpUserSet.add(user);
         } else if (direction.equals(Direction.DOWN)) {
@@ -67,6 +68,8 @@ public class Floor {
         }
         //给楼层加当前方向上的任务
         addDirectionTask(direction);
+        //用户等待时间开始计时
+        user.getStopwatch().start();
     }
 
     private void addDirectionTask(Direction direction) {
@@ -97,6 +100,7 @@ public class Floor {
         //电梯剩余负载大于所有等候人数的情况，全上。否则只上随机的一部分
         if (waitingUserSet != null) {
             if (num >= waitingUserSet.size()) {
+                //fixme Exception in thread "elevator-thread-0" java.util.ConcurrentModificationException
                 reduceSet.addAll(waitingUserSet);
                 waitingUserSet.clear();
             } else {

@@ -3,7 +3,7 @@ package biz.jared;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
 
 import biz.jared.domain.Dispatcher;
 import biz.jared.domain.Elevator;
@@ -12,12 +12,14 @@ import biz.jared.domain.User;
 import biz.jared.strategy.DispatchStrategy;
 import biz.jared.strategy.PriorityCalculationStrategy;
 import biz.jared.strategy.PriorityFirstDispatchStrategy;
+import biz.jared.strategy.RandomDispatchStrategy;
 import biz.jared.strategy.SameDirectionNearestFirstPriorityStrategy;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static biz.jared.Env.ELEVATOR_NUM;
 import static biz.jared.Env.FLOOR_NUM;
+import static biz.jared.Env.USER_NUM;
 
 /**
  * App Start
@@ -29,10 +31,22 @@ import static biz.jared.Env.FLOOR_NUM;
  */
 public class App {
 
-    private static final int USER_NUM = 13;
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) throws InterruptedException {
+        int epoch = 0;
+        while (true) {
+            LOGGER.info("===================================={}====================================", epoch++);
+            Env.LATCH = new CountDownLatch(ELEVATOR_NUM);
+            Env.TOTAL_ELEVATOR_MOVE_DISTANCE.set(0);
+            Env.TOTAL_USER_WAIT_TIME.set(0);
+            epoch(args[0], args[1]);
+            Env.LATCH.await();
+            Env.show();
+        }
+    }
+
+    private static void epoch(String dispatchStrategyStr, String priorityStrategyStr) throws InterruptedException {
         //generate all floor
         List<Floor> floorList = new ArrayList<>(FLOOR_NUM);
         for (int i = 0; i < FLOOR_NUM; i++) {
@@ -44,7 +58,7 @@ public class App {
         }
 
         //make priority strategy
-        PriorityCalculationStrategy priorityStrategy = new SameDirectionNearestFirstPriorityStrategy();
+        PriorityCalculationStrategy priorityStrategy = selectPriorityStrategy(priorityStrategyStr);
 
         //generate all elevator
         List<Elevator> elevatorList = new ArrayList<>(ELEVATOR_NUM);
@@ -53,8 +67,7 @@ public class App {
         }
 
         //make dispatch strategy
-        //DispatchStrategy dispatchStrategy = new RandomDispatchStrategy();
-        DispatchStrategy dispatchStrategy = new PriorityFirstDispatchStrategy();
+        DispatchStrategy dispatchStrategy = selectDispatchStrategy(dispatchStrategyStr);
 
         //generate dispatcher
         Dispatcher dispatcher = new Dispatcher(elevatorList, dispatchStrategy);
@@ -72,20 +85,55 @@ public class App {
         //        simulation1u(floorList);
         //        simulationNu(floorList);
         randomSimulate(floorList);
+
+    }
+
+    private static PriorityCalculationStrategy selectPriorityStrategy(String priorityStrategyStr) {
+        PriorityCalculationStrategy priorityCalculationStrategy;
+        switch (priorityStrategyStr) {
+            case "SameDirectionNearestFirst":
+                priorityCalculationStrategy = new SameDirectionNearestFirstPriorityStrategy();
+                LOGGER.debug("priorityCalculationStrategy = SameDirectionNearestFirst");
+                break;
+            default:
+                priorityCalculationStrategy = new SameDirectionNearestFirstPriorityStrategy();
+                LOGGER.debug("priorityCalculationStrategy = SameDirectionNearestFirst");
+                break;
+        }
+        return priorityCalculationStrategy;
+    }
+
+    private static DispatchStrategy selectDispatchStrategy(String dispatchStrategyStr) {
+        DispatchStrategy dispatchStrategy;
+        switch (dispatchStrategyStr) {
+            case "RandomDispatch":
+                dispatchStrategy = new RandomDispatchStrategy();
+                LOGGER.debug("dispatchStrategy = RandomDispatch");
+                break;
+            case "PriorityFirstDispatch":
+                dispatchStrategy = new PriorityFirstDispatchStrategy();
+                LOGGER.debug("dispatchStrategy = PriorityFirstDispatch");
+                break;
+            default:
+                dispatchStrategy = new RandomDispatchStrategy();
+                LOGGER.debug("dispatchStrategy = RandomDispatch");
+                break;
+        }
+        return dispatchStrategy;
     }
 
     private static void randomSimulate(List<Floor> floorList) throws InterruptedException {
         //generate all user
         Random random = new Random();
         for (int i = 0; i < USER_NUM; i++) {
-            TimeUnit.SECONDS.sleep(1);
+            Env.elapsed();
             //站在什么楼层
             int randomSrcFloorNo = random.nextInt(FLOOR_NUM);
             Floor srcFloor = floorList.get(randomSrcFloorNo);
             //想去什么楼层
             Floor targetFloor = floorList.get(differentFloorNo(randomSrcFloorNo));
             User user = new User("lucy" + i, targetFloor);
-            LOGGER.info("{} come to src_floorNo={}", user, srcFloor.getFloorNo());
+            LOGGER.debug("{} come to src_floorNo={}", user, srcFloor.getFloorNo());
             //srcFloor.locate(targetFloor).opposite()，结果Direction一定是对的，但是这里也支持传错的，也符合实际
             srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
             //srcFloor.add(user, Direction.DOWN);
@@ -98,7 +146,7 @@ public class App {
         Floor targetFloor = floorList.get(2);
         User user = new User("lucy0", targetFloor);
 
-        LOGGER.info("{} come to src_floorNo={}", user, srcFloor.getFloorNo());
+        LOGGER.debug("{} come to src_floorNo={}", user, srcFloor.getFloorNo());
         srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
     }
 
@@ -108,27 +156,27 @@ public class App {
         //想去什么楼层
         Floor targetFloor = floorList.get(0);
         User user = new User("lucy0", targetFloor);
-        LOGGER.info("{} come to src_floorNo={}", user, srcFloor.getFloorNo());
+        LOGGER.debug("{} come to src_floorNo={}", user, srcFloor.getFloorNo());
         srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
 
-        TimeUnit.SECONDS.sleep(1);
+        Env.elapsed();
 
         //user 2
         Floor srcFloor2 = floorList.get(2);
         //想去什么楼层
         Floor targetFloor2 = floorList.get(4);
         user = new User("lucy1", targetFloor2);
-        LOGGER.info("{} come to src_floorNo={}", user, srcFloor2.getFloorNo());
+        LOGGER.debug("{} come to src_floorNo={}", user, srcFloor2.getFloorNo());
         srcFloor2.add(user, srcFloor2.locate(targetFloor2).opposite());
 
-        TimeUnit.SECONDS.sleep(1);
+        Env.elapsed();
 
         //user 3
         Floor srcFloor3 = floorList.get(1);
         //想去什么楼层
         Floor targetFloor3 = floorList.get(3);
         user = new User("lucy2", targetFloor3);
-        LOGGER.info("{} come to src_floorNo={}", user, srcFloor3.getFloorNo());
+        LOGGER.debug("{} come to src_floorNo={}", user, srcFloor3.getFloorNo());
         srcFloor3.add(user, srcFloor3.locate(targetFloor3).opposite());
     }
 
