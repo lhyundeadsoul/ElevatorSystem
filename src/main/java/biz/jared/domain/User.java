@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
  */
 public class User {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(User.class);
     private String name;
     /**
      * 当前正在乘坐的电梯
@@ -18,7 +19,6 @@ public class User {
      * 目标楼层
      */
     private Floor targetFloor;
-    private static final Logger LOGGER = LoggerFactory.getLogger(User.class);
 
     public User(String name, Floor targetFloor) {
         this.name = name;
@@ -47,9 +47,9 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "name='" + name + '\'' +
-                ", targetFloor=" + targetFloor.getFloorNo() +
-                '}';
+            "name='" + name + '\'' +
+            ", targetFloor=" + targetFloor.getFloorNo() +
+            '}';
     }
 
     @Override
@@ -61,7 +61,7 @@ public class User {
             return false;
         }
 
-        User user = (User) o;
+        User user = (User)o;
 
         return name.equals(user.name);
     }

@@ -1,9 +1,5 @@
 package biz.jared;
 
-import biz.jared.domain.Elevator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * 系统运行依赖的环境参数
  *
@@ -16,11 +12,11 @@ public class Env {
      */
     public static final int FLOOR_NUM = 10;
     /**
-     * 电梯数
-     */
-    static final int ELEVATOR_NUM = 2;
-    /**
      * 最大负载人数
      */
     public static final int MAX_LOAD = 2;
+    /**
+     * 电梯数
+     */
+    static final int ELEVATOR_NUM = 2;
 }

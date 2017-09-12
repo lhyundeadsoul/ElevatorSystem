@@ -31,7 +31,7 @@
         <!--<logger name="org.springframework.core" level="info">
         </logger>-->
 
-        <logger name="biz.jared" level="debug" includeLocation="true" additivity="false">
+        <logger name="biz.jared" level="info" includeLocation="true" additivity="false">
             <appender-ref ref="ErrorLog"/>
             <appender-ref ref="Console"/>
         </logger>

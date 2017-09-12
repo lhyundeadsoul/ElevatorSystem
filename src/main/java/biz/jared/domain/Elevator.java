@@ -30,6 +30,7 @@ import static biz.jared.Env.MAX_LOAD;
  */
 public class Elevator implements Runnable {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Elevator.class);
     private int id;
     /**
      * 当前所处楼层
@@ -47,7 +48,6 @@ public class Elevator implements Runnable {
      * 当前正在执行的任务
      */
     private Task currTask;
-
     /**
      * 负责调度此电梯的调度器
      */
@@ -64,7 +64,6 @@ public class Elevator implements Runnable {
      * 用于锁楼层（在读取楼层并做任务优先的决策时，不能改楼层数据）
      */
     private ReadWriteLock rwLock = new ReentrantReadWriteLock();
-    private static final Logger LOGGER = LoggerFactory.getLogger(Elevator.class);
 
     public Elevator(int id, Floor initFloor, PriorityCalculationStrategy priorityCalculationStrategy) {
         this.id = id;
@@ -132,7 +131,7 @@ public class Elevator implements Runnable {
     private boolean needGrab(Task task) {
         int newPriority = tryReceive(currTask);
         currTask.setPriority(newPriority);
-        LOGGER.trace("update current {} priority {}" ,currTask, newPriority);
+        LOGGER.trace("update current {} priority {}", currTask, newPriority);
         return task.isPriorityHigherThan(currTask);
     }
 
@@ -241,7 +240,7 @@ public class Elevator implements Runnable {
         if (!reduceSet.isEmpty()) {
             //电梯增加负载
             currLoad.addAll(reduceSet);
-            LOGGER.info("{} loading {} users: {}", this,reduceSet.size(), reduceSet);
+            LOGGER.info("{} loading {} users: {}", this, reduceSet.size(), reduceSet);
             //每个上电梯的人都按一下想去的楼层
             reduceSet.forEach(user -> {
                 user.enterElevator(this);

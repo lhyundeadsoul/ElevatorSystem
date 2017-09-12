@@ -1,10 +1,12 @@
 package biz.jared.domain;
 
-import biz.jared.domain.enumeration.Direction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import java.util.*;
+import biz.jared.domain.enumeration.Direction;
 
 /**
  * @author jared
@@ -135,8 +137,8 @@ public class Floor {
     @Override
     public String toString() {
         return "Floor{" +
-                "floorNo=" + floorNo +
-                '}';
+            "floorNo=" + floorNo +
+            '}';
     }
 
     public void setDispatcher(Dispatcher dispatcher) {
@@ -152,7 +154,7 @@ public class Floor {
             return false;
         }
 
-        Floor floor = (Floor) o;
+        Floor floor = (Floor)o;
 
         return floorNo == floor.floorNo;
     }

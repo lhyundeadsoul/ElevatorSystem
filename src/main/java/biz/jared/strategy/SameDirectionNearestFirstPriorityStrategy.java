@@ -48,18 +48,18 @@ public class SameDirectionNearestFirstPriorityStrategy implements PriorityCalcul
                 priority = calcPriorityOnRunningDown(x, y, isSameDirection);
                 break;
             case IDLE:
-//                priority = Direction.UP.equals(task.getSrcFloor().locate(elevator.getCurrFloor()))
-//                        ? calcPriorityOnRunningUp(x, y, isSameDirection)
-//                        : calcPriorityOnRunningDown(x, y, isSameDirection);
+                //                priority = Direction.UP.equals(task.getSrcFloor().locate(elevator.getCurrFloor()))
+                //                        ? calcPriorityOnRunningUp(x, y, isSameDirection)
+                //                        : calcPriorityOnRunningDown(x, y, isSameDirection);
                 priority = Math.abs(x - y);
                 break;
             default:
                 throw new IllegalArgumentException();
         }
         //priority已经是2倍楼层总数了，优先级要循环
-//        if (priority == MAX_PRIORITY) {
-//            priority = 0;
-//        }
+        //        if (priority == MAX_PRIORITY) {
+        //            priority = 0;
+        //        }
         return priority;
     }
 

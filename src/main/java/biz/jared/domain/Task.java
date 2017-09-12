@@ -1,16 +1,17 @@
 package biz.jared.domain;
 
+import java.util.Random;
+
 import biz.jared.domain.enumeration.Direction;
 import biz.jared.domain.enumeration.TaskStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
-
 /**
  * @author jared
  */
 public class Task implements Comparable<Task> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Task.class);
     private int id;
     /**
      * 产生此task的源楼层
@@ -20,11 +21,8 @@ public class Task implements Comparable<Task> {
      * 这是一个想去什么方向的task？
      */
     private Direction direction;
-
     private TaskStatus status;
-
     private int priority;
-    private static final Logger LOGGER = LoggerFactory.getLogger(Task.class);
 
     private Task(int id, Floor srcFloor, Direction direction) {
         this.id = id;
@@ -73,10 +71,10 @@ public class Task implements Comparable<Task> {
     @Override
     public String toString() {
         return "Task{" +
-                "id=" + id +
-                ", src floor=" + srcFloor.getFloorNo() +
-                ", direction=" + direction +
-                '}';
+            "id=" + id +
+            ", src floor=" + srcFloor.getFloorNo() +
+            ", direction=" + direction +
+            '}';
     }
 
     void setPriority(int priority) {
@@ -119,10 +117,11 @@ public class Task implements Comparable<Task> {
             return false;
         }
 
-        Task task = (Task) o;
+        Task task = (Task)o;
         //NONE方向的任务和所有方向的任务都equal
         return (srcFloor != null ? srcFloor.equals(task.srcFloor) : task.srcFloor == null)
-                && (direction.equals(task.direction) || direction.equals(Direction.NONE) || task.direction.equals(Direction.NONE));
+            && (direction.equals(task.direction) || direction.equals(Direction.NONE) || task.direction.equals(
+            Direction.NONE));
     }
 
     @Override

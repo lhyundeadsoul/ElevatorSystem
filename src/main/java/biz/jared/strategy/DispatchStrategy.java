@@ -1,9 +1,9 @@
 package biz.jared.strategy;
 
+import java.util.List;
+
 import biz.jared.domain.Elevator;
 import biz.jared.domain.Task;
-
-import java.util.List;
 
 /**
  * 任务分配策略

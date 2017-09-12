@@ -1,5 +1,10 @@
 package biz.jared;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
 import biz.jared.domain.Dispatcher;
 import biz.jared.domain.Elevator;
 import biz.jared.domain.Floor;
@@ -10,11 +15,6 @@ import biz.jared.strategy.PriorityFirstDispatchStrategy;
 import biz.jared.strategy.SameDirectionNearestFirstPriorityStrategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import static biz.jared.Env.ELEVATOR_NUM;
 import static biz.jared.Env.FLOOR_NUM;
@@ -69,8 +69,8 @@ public class App {
         elevatorList.forEach(elevator -> new Thread(elevator, "elevator-thread-" + elevator.getId()).start());
 
         //simulation
-//        simulation1u(floorList);
-//        simulationNu(floorList);
+        //        simulation1u(floorList);
+        //        simulationNu(floorList);
         randomSimulate(floorList);
     }
 
@@ -85,8 +85,7 @@ public class App {
             //想去什么楼层
             Floor targetFloor = floorList.get(differentFloorNo(randomSrcFloorNo));
             User user = new User("lucy" + i, targetFloor);
-            System.out.println("src_floorNo=" + srcFloor.getFloorNo() + " " + user);
-            LOGGER.info("{} come to src_floorNo={}",user,srcFloor.getFloorNo());
+            LOGGER.info("{} come to src_floorNo={}", user, srcFloor.getFloorNo());
             //srcFloor.locate(targetFloor).opposite()，结果Direction一定是对的，但是这里也支持传错的，也符合实际
             srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
             //srcFloor.add(user, Direction.DOWN);
@@ -98,7 +97,8 @@ public class App {
         //想去什么楼层
         Floor targetFloor = floorList.get(2);
         User user = new User("lucy0", targetFloor);
-        System.out.println("src_floorNo=" + srcFloor.getFloorNo() + " " + user);
+
+        LOGGER.info("{} come to src_floorNo={}", user, srcFloor.getFloorNo());
         srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
     }
 
@@ -108,7 +108,7 @@ public class App {
         //想去什么楼层
         Floor targetFloor = floorList.get(0);
         User user = new User("lucy0", targetFloor);
-        System.out.println("src_floorNo=" + srcFloor.getFloorNo() + " " + user);
+        LOGGER.info("{} come to src_floorNo={}", user, srcFloor.getFloorNo());
         srcFloor.add(user, srcFloor.locate(targetFloor).opposite());
 
         TimeUnit.SECONDS.sleep(1);
@@ -118,7 +118,7 @@ public class App {
         //想去什么楼层
         Floor targetFloor2 = floorList.get(4);
         user = new User("lucy1", targetFloor2);
-        System.out.println("src_floorNo=" + srcFloor2.getFloorNo() + " " + user);
+        LOGGER.info("{} come to src_floorNo={}", user, srcFloor2.getFloorNo());
         srcFloor2.add(user, srcFloor2.locate(targetFloor2).opposite());
 
         TimeUnit.SECONDS.sleep(1);
@@ -128,7 +128,7 @@ public class App {
         //想去什么楼层
         Floor targetFloor3 = floorList.get(3);
         user = new User("lucy2", targetFloor3);
-        System.out.println("src_floorNo=" + srcFloor3.getFloorNo() + " " + user);
+        LOGGER.info("{} come to src_floorNo={}", user, srcFloor3.getFloorNo());
         srcFloor3.add(user, srcFloor3.locate(targetFloor3).opposite());
     }
 

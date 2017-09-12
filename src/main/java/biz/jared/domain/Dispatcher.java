@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
  * @author jared
  */
 public class Dispatcher {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Dispatcher.class);
     /**
      * 可以调度的电梯列表
      */
@@ -28,8 +29,6 @@ public class Dispatcher {
      * 用于异步完成dispatch task
      */
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Dispatcher.class);
 
     public Dispatcher(List<Elevator> elevatorList, DispatchStrategy dispatchStrategy) {
         this.elevatorList = elevatorList;
