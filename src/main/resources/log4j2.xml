@@ -55,13 +55,14 @@
     <Loggers>
         <logger name="biz.jared.App" level="info">
             <appender-ref ref="ElapseLog"/>
+            <appender-ref ref="Console"/>
         </logger>
         <logger name="biz.jared.Env" level="info">
             <appender-ref ref="ElapseLog"/>
+            <appender-ref ref="Console"/>
         </logger>
         <logger name="biz.jared" level="debug" includeLocation="true" additivity="false">
             <appender-ref ref="RunLog"/>
-            <appender-ref ref="Console"/>
         </logger>
         <root level="info" includeLocation="true">
             <appender-ref ref="Console"/>
