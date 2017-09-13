@@ -316,6 +316,10 @@ public class Elevator implements Runnable {
         return id;
     }
 
+    public Dispatcher getDispatcher() {
+        return dispatcher;
+    }
+
     public ElevatorStatus getStatus() {
         return status;
     }

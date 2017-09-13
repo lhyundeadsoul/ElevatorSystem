@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import biz.jared.Env;
 import biz.jared.strategy.DispatchStrategy;
@@ -25,6 +27,10 @@ public class Dispatcher {
      * 任务分配策略
      */
     private DispatchStrategy dispatchStrategy;
+    /**
+     *
+     */
+    private ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     /**
      * 用于异步完成dispatch task
      */
@@ -77,12 +83,17 @@ public class Dispatcher {
      * @param elevator
      */
     void quit(Elevator elevator) {
-        //fixme Exception in thread "elevator-thread-0" java.util.ConcurrentModificationException
+        readWriteLock.writeLock().lock();
         elevatorList.removeIf(e -> e.equals(elevator));
+        readWriteLock.writeLock().unlock();
         //无电梯可调度时要shutdown线程池
         if (elevatorList.isEmpty()) {
             executorService.shutdown();
         }
         Env.LATCH.countDown();
+    }
+
+    public ReadWriteLock getReadWriteLock() {
+        return readWriteLock;
     }
 }

@@ -18,7 +18,7 @@ public class Env {
     /**
      * 总楼层数
      */
-    public static final int FLOOR_NUM = 10;
+    public static final int FLOOR_NUM = 30;
     /**
      * 最大负载人数
      */
@@ -30,7 +30,7 @@ public class Env {
     /**
      * 总用户数
      */
-    static final int USER_NUM = 10;
+    static final int USER_NUM = 20;
     /**
      * 时间单位
      */
