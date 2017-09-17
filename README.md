@@ -1,3 +1,7 @@
+![](https://img.shields.io/travis/USER/REPO.svg)
+![](https://img.shields.io/github/issues/lhyundeadsoul/ElevatorSystem.svg)
+![](https://img.shields.io/github/forks/lhyundeadsoul/ElevatorSystem.svg)
+![](https://img.shields.io/github/stars/lhyundeadsoul/ElevatorSystem.svg)
 # ElevatorSystem
 a Multi-elevator System
 
@@ -18,6 +22,6 @@ a Multi-elevator System
 - [x] todo
 - [x] sync block
 - [ ] UT
-- [ ] CI
+- [x] CI
 - [x] 全部电梯满载时会死循环
 - [x] 加入吞吐、平均等待时间等指标
