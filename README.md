@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9084b4d0243b4e8c8314168ed2a7deda)](https://www.codacy.com/app/lhyundeadsoul/ElevatorSystem?utm_source=github.com&utm_medium=referral&utm_content=lhyundeadsoul/ElevatorSystem&utm_campaign=badger)
 [![Travis](https://img.shields.io/travis/rust-lang/rust.svg?style=plastic)](https://github.com/lhyundeadsoul/ElevatorSystem)
 [![CircleCI](https://img.shields.io/circleci/project/github/RedSparr0w/node-csgo-parser.svg)](https://github.com/lhyundeadsoul/ElevatorSystem)
 [![codebeat badge](https://codebeat.co/badges/8863dd20-d5c9-4191-9825-2f86a27b449c)](https://codebeat.co/projects/github-com-lhyundeadsoul-elevatorsystem-master)
