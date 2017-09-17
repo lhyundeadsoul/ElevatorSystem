@@ -20,7 +20,7 @@ public class User {
     /**
      * 目标楼层
      */
-    private Floor targetFloor;
+    private Floor1 targetFloor;
     /**
      * 计时器对等待时间计时
      */
