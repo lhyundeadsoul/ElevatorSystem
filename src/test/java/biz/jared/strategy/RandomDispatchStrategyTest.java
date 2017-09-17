@@ -8,6 +8,7 @@ import junit.framework.TestCase;
  */
 public class RandomDispatchStrategyTest extends TestCase {
     public void testSelect() throws Exception {
+
     }
 
 }
