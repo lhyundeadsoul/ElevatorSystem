@@ -11,7 +11,13 @@ a Multi-elevator System
 ## Design
 ![arch](src/main/resources/ElevatorSystem.png)
 
-
+# Run it
+```$xslt
+mvn clean -DskipTests=true package
+nohup java -jar ~/Sources/ElevatorSystem/target/elevator-system-1.0-SNAPSHOT-jar-with-dependencies.jar {dispatch-strategy} {priority-strategy} >/dev/null 2>&1 &
+> dispatch-strategy = RandomDispatch / PriorityFirstDispatch 
+> priority-strategy = SameDirectionNearestFirst
+```
 ## Feature
 1. support multi-task/multi-elevator dispatch
 2. support elevator maximum load
