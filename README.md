@@ -1,4 +1,5 @@
-![](https://img.shields.io/travis/USER/REPO.svg)
+[![Travis](https://img.shields.io/travis/rust-lang/rust.svg?style=plastic)](https://github.com/lhyundeadsoul/ElevatorSystem)
+![](https://img.shields.io/badge/language-java-blue.svg)
 ![](https://img.shields.io/github/issues/lhyundeadsoul/ElevatorSystem.svg)
 ![](https://img.shields.io/github/forks/lhyundeadsoul/ElevatorSystem.svg)
 ![](https://img.shields.io/github/stars/lhyundeadsoul/ElevatorSystem.svg)
