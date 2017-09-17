@@ -57,9 +57,9 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-            "name='" + name + '\'' +
-            ", targetFloor=" + targetFloor.getFloorNo() +
-            '}';
+                "name='" + name + '\'' +
+                ", targetFloor=" + targetFloor.getFloorNo() +
+                '}';
     }
 
     @Override
@@ -71,7 +71,7 @@ public class User {
             return false;
         }
 
-        User user = (User)o;
+        User user = (User) o;
         return name.equals(user.name);
     }
 

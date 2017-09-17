@@ -1,16 +1,16 @@
 package biz.jared.domain;
 
+import biz.jared.Env;
+import biz.jared.strategy.DispatchStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import biz.jared.Env;
-import biz.jared.strategy.DispatchStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 多电梯系统的任务总调度器
@@ -56,7 +56,7 @@ public class Dispatcher {
             while ((elevator = dispatchStrategy.select(elevatorList, task)) == null) {
                 Env.elapsed();
                 LOGGER.warn(
-                    "dispatcher can't select one elevator, maybe all of them are in max load , retry dispatch...");
+                        "dispatcher can't select one elevator, maybe all of them are in max load , retry dispatch...");
             }
             LOGGER.info("dispatch task:{} result: give it to {}", task, elevator);
             elevator.receive(task);

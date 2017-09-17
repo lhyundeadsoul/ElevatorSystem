@@ -1,25 +1,19 @@
 package biz.jared;
 
+import biz.jared.domain.Dispatcher;
+import biz.jared.domain.Elevator;
+import biz.jared.domain.Floor;
+import biz.jared.domain.User;
+import biz.jared.strategy.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
-import biz.jared.domain.Dispatcher;
-import biz.jared.domain.Elevator;
-import biz.jared.domain.Floor;
-import biz.jared.domain.User;
-import biz.jared.strategy.DispatchStrategy;
-import biz.jared.strategy.PriorityCalculationStrategy;
-import biz.jared.strategy.PriorityFirstDispatchStrategy;
-import biz.jared.strategy.RandomDispatchStrategy;
-import biz.jared.strategy.SameDirectionNearestFirstPriorityStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static biz.jared.Env.ELEVATOR_NUM;
-import static biz.jared.Env.FLOOR_NUM;
-import static biz.jared.Env.USER_NUM;
+import static biz.jared.Env.*;
 
 /**
  * App Start
@@ -126,12 +120,14 @@ public class App {
         //generate all user
         Random random = new Random();
         for (int i = 0; i < USER_NUM; i++) {
-            Env.elapsed();
+//            Env.elapsed();
             //站在什么楼层
             int randomSrcFloorNo = random.nextInt(FLOOR_NUM);
-            Floor srcFloor = floorList.get(randomSrcFloorNo);
+//            Floor srcFloor = floorList.get(randomSrcFloorNo);
+            Floor srcFloor = floorList.get(0);
             //想去什么楼层
-            Floor targetFloor = floorList.get(differentFloorNo(randomSrcFloorNo));
+//            Floor targetFloor = floorList.get(differentFloorNo(randomSrcFloorNo));
+            Floor targetFloor = floorList.get(1);
             User user = new User("lucy" + i, targetFloor);
             LOGGER.debug("{} come to src_floorNo={}", user, srcFloor.getFloorNo());
             //srcFloor.locate(targetFloor).opposite()，结果Direction一定是对的，但是这里也支持传错的，也符合实际

@@ -1,5 +1,6 @@
 package biz.jared.strategy;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 /**
@@ -8,7 +9,7 @@ import junit.framework.TestCase;
  */
 public class RandomDispatchStrategyTest extends TestCase {
     public void testSelect() throws Exception {
-
+        Assert.assertTrue("always true",true);
     }
 
 }

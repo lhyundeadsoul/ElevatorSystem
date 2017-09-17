@@ -32,9 +32,9 @@ public class Calc {
      */
     public static boolean isSameDirection(Elevator elevator, Task task) {
         return (elevator.getStatus().equals(ElevatorStatus.RUNNING_UP) && task.getDirection().equals(Direction.UP))
-            || (elevator.getStatus().equals(ElevatorStatus.RUNNING_DOWN) && task.getDirection().equals(Direction.DOWN))
-            || task.getDirection().equals(Direction.NONE)
-            || elevator.getStatus().equals(ElevatorStatus.IDLE);
+                || (elevator.getStatus().equals(ElevatorStatus.RUNNING_DOWN) && task.getDirection().equals(Direction.DOWN))
+                || task.getDirection().equals(Direction.NONE)
+                || elevator.getStatus().equals(ElevatorStatus.IDLE);
     }
 
 }

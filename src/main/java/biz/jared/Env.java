@@ -1,11 +1,11 @@
 package biz.jared;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 系统运行依赖的环境参数
@@ -30,13 +30,13 @@ public class Env {
     /**
      * 总用户数
      */
-    static final int USER_NUM = 20;
+    static final int USER_NUM = 22;
     /**
      * 时间单位
      */
     public static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
     /**
-     * 时间长度
+     * 所有操作需要流逝的时间长度
      */
     public static final int ELAPSED_TIME = 10;
 
@@ -56,8 +56,8 @@ public class Env {
     private static final Logger LOGGER = LoggerFactory.getLogger(Env.class);
 
     static void show() {
-        LOGGER.info("average wait time {}", TOTAL_USER_WAIT_TIME.get() / (double)USER_NUM);
-        LOGGER.info("average elevator move distance {}", TOTAL_ELEVATOR_MOVE_DISTANCE.get() / (double)ELEVATOR_NUM);
+        LOGGER.info("average wait time {}", TOTAL_USER_WAIT_TIME.get() / (double) USER_NUM);
+        LOGGER.info("average elevator move distance {}", TOTAL_ELEVATOR_MOVE_DISTANCE.get() / (double) ELEVATOR_NUM);
     }
 
     public static void elapsed() {

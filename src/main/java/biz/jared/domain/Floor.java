@@ -1,12 +1,10 @@
 package biz.jared.domain;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import biz.jared.domain.enumeration.Direction;
+
+import java.util.*;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author jared
@@ -23,6 +21,14 @@ public class Floor {
      * 当前楼层往下走的等候人群
      */
     private Set<User> waitingDownUserSet = new HashSet<>(100);
+    /**
+     * 向上等候人群读写锁，杜绝并发异常
+     */
+    private ReadWriteLock upUserSetLock = new ReentrantReadWriteLock();
+    /**
+     * 向下等候人群读写锁，杜绝并发异常
+     */
+    private ReadWriteLock downUserSetLock = new ReentrantReadWriteLock();
     /**
      * 已经有人表达说要去的方向集合
      */
@@ -62,9 +68,13 @@ public class Floor {
     public void add(User user, Direction direction) {
         //给相应方向上的等待队列加用户
         if (direction.equals(Direction.UP)) {
+            upUserSetLock.writeLock().lock();
             waitingUpUserSet.add(user);
+            upUserSetLock.writeLock().unlock();
         } else if (direction.equals(Direction.DOWN)) {
+            downUserSetLock.writeLock().lock();
             waitingDownUserSet.add(user);
+            downUserSetLock.writeLock().unlock();
         }
         //给楼层加当前方向上的任务
         addDirectionTask(direction);
@@ -92,15 +102,18 @@ public class Floor {
         Set<User> reduceSet = new HashSet<>(num);
         //准备接走哪一个方向的人，另一个方向的人不能上
         Set<User> waitingUserSet = null;
+        ReadWriteLock userSetLock = null;
         if (direction.equals(Direction.UP)) {
             waitingUserSet = waitingUpUserSet;
+            userSetLock = upUserSetLock;
         } else if (direction.equals(Direction.DOWN)) {
             waitingUserSet = waitingDownUserSet;
+            userSetLock = downUserSetLock;
         }
         //电梯剩余负载大于所有等候人数的情况，全上。否则只上随机的一部分
         if (waitingUserSet != null) {
+            userSetLock.readLock().lock();
             if (num >= waitingUserSet.size()) {
-                //fixme Exception in thread "elevator-thread-0" java.util.ConcurrentModificationException
                 reduceSet.addAll(waitingUserSet);
                 waitingUserSet.clear();
             } else {
@@ -111,6 +124,7 @@ public class Floor {
                     reduceSet.add(next);
                 }
             }
+            userSetLock.readLock().unlock();
         }
         return reduceSet;
     }
@@ -141,8 +155,8 @@ public class Floor {
     @Override
     public String toString() {
         return "Floor{" +
-            "floorNo=" + floorNo +
-            '}';
+                "floorNo=" + floorNo +
+                '}';
     }
 
     public void setDispatcher(Dispatcher dispatcher) {
@@ -158,7 +172,7 @@ public class Floor {
             return false;
         }
 
-        Floor floor = (Floor)o;
+        Floor floor = (Floor) o;
 
         return floorNo == floor.floorNo;
     }

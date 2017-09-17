@@ -1,15 +1,5 @@
 package biz.jared.domain;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.Collectors;
-
 import biz.jared.Calc;
 import biz.jared.Env;
 import biz.jared.domain.enumeration.Direction;
@@ -22,6 +12,16 @@ import biz.jared.exception.UserInFloorTaskGrabbedException;
 import biz.jared.strategy.PriorityCalculationStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 import static biz.jared.Env.MAX_LOAD;
 
@@ -108,7 +108,7 @@ public class Elevator implements Runnable {
         try {
             taskQueue.put(task);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.error("do receive task error", e);
         }
     }
 
@@ -173,7 +173,7 @@ public class Elevator implements Runnable {
                 LOGGER.warn("{} has been grabbed so delay execute ...", task);
                 receive(task);
             } catch (Throwable e) {//其它情况
-                LOGGER.error("unknown error:",e);
+                LOGGER.error("unknown error:", e);
             } finally {
                 //finish, i'm idle
                 onIdle();
@@ -193,12 +193,12 @@ public class Elevator implements Runnable {
      * 执行任务逻辑
      *
      * @param task 待执行的任务
-     * @throws TaskCancelledException 执行过程中任务被取消的情况
+     * @throws TaskCancelledException  执行过程中任务被取消的情况
      * @throws CannotExecTaskException 执行过程中发现任务无法再执行的情况
      */
     private void execTask(Task task)
-        throws TaskCancelledException, CannotExecTaskException, UserInElevatorTaskGrabbedException,
-        InterruptedException, UserInFloorTaskGrabbedException {
+            throws TaskCancelledException, CannotExecTaskException, UserInElevatorTaskGrabbedException,
+            InterruptedException, UserInFloorTaskGrabbedException {
         if (task == null) {
             return;
         }
@@ -254,8 +254,8 @@ public class Elevator implements Runnable {
     private void unload() {
         //获取已经到目标楼层的人
         Set<User> unloadSet = currLoad.stream()
-            .filter(user -> user.getTargetFloor().equals(currFloor))
-            .collect(Collectors.toSet());
+                .filter(user -> user.getTargetFloor().equals(currFloor))
+                .collect(Collectors.toSet());
         if (unloadSet.size() > 0) {
             //卸载掉
             currLoad.removeAll(unloadSet);
@@ -269,8 +269,8 @@ public class Elevator implements Runnable {
      * @param task
      */
     private void move(Task task)
-        throws TaskCancelledException, UserInElevatorTaskGrabbedException, InterruptedException,
-        UserInFloorTaskGrabbedException {
+            throws TaskCancelledException, UserInElevatorTaskGrabbedException, InterruptedException,
+            UserInFloorTaskGrabbedException {
         //设置任务状态
         task.setStatus(TaskStatus.RUNNING);
 
@@ -306,10 +306,10 @@ public class Elevator implements Runnable {
     @Override
     public String toString() {
         return "Elevator{" +
-            "id=" + id +
-            ", currFloor=" + currFloor.getFloorNo() +
-            ", currLoad=" + currLoad +
-            '}';
+                "id=" + id +
+                ", currFloor=" + currFloor.getFloorNo() +
+                ", currLoad=" + currLoad +
+                '}';
     }
 
     public int getId() {
@@ -360,7 +360,7 @@ public class Elevator implements Runnable {
             return false;
         }
 
-        Elevator elevator = (Elevator)o;
+        Elevator elevator = (Elevator) o;
 
         return id == elevator.id;
     }
