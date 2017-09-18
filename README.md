@@ -16,9 +16,11 @@ a Multi-elevator System
 ```$xslt
 mvn clean -DskipTests=true package
 nohup java -jar ~/Sources/ElevatorSystem/target/elevator-system-1.0-SNAPSHOT-jar-with-dependencies.jar {dispatch-strategy} {priority-strategy} >/dev/null 2>&1 &
-> dispatch-strategy = RandomDispatch / PriorityFirstDispatch 
-> priority-strategy = SameDirectionNearestFirst
 ```
+> dispatch-strategy = RandomDispatch / PriorityFirstDispatch
+ 
+> priority-strategy = SameDirectionNearestFirst
+
 ## Feature
 1. support multi-task/multi-elevator dispatch
 2. support elevator maximum load
@@ -30,8 +32,10 @@ nohup java -jar ~/Sources/ElevatorSystem/target/elevator-system-1.0-SNAPSHOT-jar
 - [x] dispatcher任务分配优先级还没排查
 - [x] 电梯任务抢占
 - [x] todo
-- [x] sync block
 - [ ] UT
 - [x] CI
 - [x] 全部电梯满载时会死循环
 - [x] 加入吞吐、平均等待时间等指标
+- [ ] RejectedExecutionException
+- [ ] 梳理所有竞争代码块，检查是否有未处理的情况
+- [ ] 尝试设计新的strategy

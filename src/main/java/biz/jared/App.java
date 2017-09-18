@@ -120,14 +120,12 @@ public class App {
         //generate all user
         Random random = new Random();
         for (int i = 0; i < USER_NUM; i++) {
-//            Env.elapsed();
+            Env.elapsed();
             //站在什么楼层
             int randomSrcFloorNo = random.nextInt(FLOOR_NUM);
-//            Floor srcFloor = floorList.get(randomSrcFloorNo);
-            Floor srcFloor = floorList.get(0);
+            Floor srcFloor = floorList.get(randomSrcFloorNo);
             //想去什么楼层
-//            Floor targetFloor = floorList.get(differentFloorNo(randomSrcFloorNo));
-            Floor targetFloor = floorList.get(1);
+            Floor targetFloor = floorList.get(differentFloorNo(randomSrcFloorNo));
             User user = new User("lucy" + i, targetFloor);
             LOGGER.debug("{} come to src_floorNo={}", user, srcFloor.getFloorNo());
             //srcFloor.locate(targetFloor).opposite()，结果Direction一定是对的，但是这里也支持传错的，也符合实际
