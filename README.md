@@ -39,3 +39,4 @@ nohup java -jar ~/Sources/ElevatorSystem/target/elevator-system-1.0-SNAPSHOT-jar
 - [ ] RejectedExecutionException
 - [ ] 梳理所有竞争代码块，检查是否有未处理的情况
 - [ ] 尝试设计新的strategy
+- [ ] 系统开发中遇到的细节问题总结梳理

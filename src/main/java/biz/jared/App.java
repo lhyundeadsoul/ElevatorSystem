@@ -28,6 +28,7 @@ public class App {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) throws InterruptedException {
+        printLogo();
         int epoch = 0;
         while (true) {
             LOGGER.info("===================================={}====================================", epoch++);
@@ -38,6 +39,15 @@ public class App {
             Env.LATCH.await();
             Env.show();
         }
+    }
+
+    private static void printLogo() {
+        LOGGER.info("\n"
+            + "        \"\"#                           m\n"
+            + "  mmm     #     mmm   m   m   mmm   mm#mm   mmm    m mm\n"
+            + " #\"  #    #    #\"  #  \"m m\"  \"   #    #    #\" \"#   #\"  \"\n"
+            + " #\"\"\"\"    #    #\"\"\"\"   #m#   m\"\"\"#    #    #   #   #\n"
+            + " \"#mm\"    \"mm  \"#mm\"    #    \"mm\"#    \"mm  \"#m#\"   #");
     }
 
     private static void epoch(String dispatchStrategyStr, String priorityStrategyStr) throws InterruptedException {
