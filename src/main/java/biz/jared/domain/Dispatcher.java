@@ -50,6 +50,7 @@ public class Dispatcher {
         if (task == null) {
             return;
         }
+        // !executorService.isShutdown() this for avoid RejectedExecutionException
         if (executorService != null && !executorService.isShutdown()) {
             executorService.submit(() -> {
                 Elevator elevator;
