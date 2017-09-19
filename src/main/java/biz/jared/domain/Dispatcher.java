@@ -50,17 +50,19 @@ public class Dispatcher {
         if (task == null) {
             return;
         }
-        executorService.submit(() -> {
-            Elevator elevator;
-            //如果选不出来电梯，就一直重试
-            while ((elevator = dispatchStrategy.select(elevatorList, task)) == null) {
-                Env.elapsed();
-                LOGGER.warn(
-                        "dispatcher can't select one elevator, maybe all of them are in max load , retry dispatch...");
-            }
-            LOGGER.info("dispatch task:{} result: give it to {}", task, elevator);
-            elevator.receive(task);
-        });
+        if (executorService != null && !executorService.isShutdown()) {
+            executorService.submit(() -> {
+                Elevator elevator;
+                //如果选不出来电梯，就一直重试
+                while ((elevator = dispatchStrategy.select(elevatorList, task)) == null) {
+                    Env.elapsed();
+                    LOGGER.warn(
+                            "dispatcher can't select one elevator, maybe all of them are in max load , retry dispatch...");
+                }
+                LOGGER.info("dispatch task:{} result: give it to {}", task, elevator);
+                elevator.receive(task);
+            });
+        }
     }
 
     void cancel(Task task) {
