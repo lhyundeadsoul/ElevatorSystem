@@ -22,7 +22,7 @@ public class Floor {
      */
     private Set<User> waitingDownUserSet = new HashSet<>(100);
     /**
-     * 向上等候人群读写锁，杜绝并发异常
+     * 向上等候人群读写锁，杜绝并发异常，因为waitingUpUserSet可能会同时在main线程里写，在电梯线程里读
      */
     private ReadWriteLock upUserSetLock = new ReentrantReadWriteLock();
     /**
@@ -33,6 +33,10 @@ public class Floor {
      * 已经有人表达说要去的方向集合
      */
     private Map<Direction, Task> waitingDirectionMap = new HashMap<>(Direction.values().length);
+    /**
+     * waitingDirectionMap可能会同时在main线程里读，在电梯线程里写
+     */
+    private ReadWriteLock waitingDirectionMapLock = new ReentrantReadWriteLock();
     /**
      * 整个电梯的调度
      */
@@ -84,11 +88,13 @@ public class Floor {
 
     private void addDirectionTask(Direction direction) {
         //只有之前没人说要去的方向才可以建任务，已经有人说要去的方向就不用再说一次了
+        waitingDirectionMapLock.readLock().lock();
         if (!waitingDirectionMap.containsKey(direction)) {
             Task task = Task.generate(this, direction);
             waitingDirectionMap.put(direction, task);
             dispatcher.dispatch(task);
         }
+        waitingDirectionMapLock.readLock().unlock();
     }
 
     /**
@@ -137,13 +143,17 @@ public class Floor {
     public void cancel(Direction direction) {
         if (waitingDirectionMap.containsKey(direction)) {
             dispatcher.cancel(waitingDirectionMap.get(direction));
+            waitingDirectionMapLock.writeLock().lock();
             waitingDirectionMap.remove(direction);
+            waitingDirectionMapLock.writeLock().unlock();
         }
     }
 
     void done(Direction direction) {
         if (waitingDirectionMap.containsKey(direction)) {
+            waitingDirectionMapLock.writeLock().lock();
             waitingDirectionMap.remove(direction);
+            waitingDirectionMapLock.writeLock().unlock();
             //当电梯因为满载而无法全部把人带走时，继续产生新的任务
             Set<User> remainingUsers = direction.equals(Direction.UP) ? waitingUpUserSet : waitingDownUserSet;
             if (!remainingUsers.isEmpty()) {

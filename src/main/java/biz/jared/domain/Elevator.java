@@ -53,17 +53,31 @@ public class Elevator implements Runnable {
      */
     private Dispatcher dispatcher;
     /**
-     * 电梯的任务列表，只是单方向的任务序列，逻辑简单、单一
+     * 电梯的任务列表，读写操作都在电梯线程这一个线程里，所以不用锁保护
      */
     private BlockingQueue<Task> taskQueue = new PriorityBlockingQueue<>();
     /**
      * 任务优先级计算策略
      */
     private PriorityCalculationStrategy priorityCalculationStrategy;
+
+    //================many lock to protect elevator status===================
     /**
      * 用于锁楼层（在读取楼层并做任务优先的决策时，不能改楼层数据）
      */
-    private ReadWriteLock rwLock = new ReentrantReadWriteLock();
+    private ReadWriteLock currFloorLock = new ReentrantReadWriteLock();
+    /**
+     * dispatcher里的线程池要"连续读"currTask这个属性，而电梯线程可以"同时写"currTask这个属性，存在并发错误的可能，且不会引发任何异常，需要加锁
+     */
+    private ReadWriteLock currTaskLock = new ReentrantReadWriteLock();
+    /**
+     * currLoad属性可能同时在电梯线程里写，在dispatchStrategy-select时读，所以要加锁保护
+     */
+    private ReadWriteLock currLoadLock = new ReentrantReadWriteLock();
+    /**
+     * status属性可能同时在电梯线程里写，在dispatcher-tryReceive时读，所以要加锁保护
+     */
+    private ReadWriteLock statusLock = new ReentrantReadWriteLock();
 
     public Elevator(int id, Floor initFloor, PriorityCalculationStrategy priorityCalculationStrategy) {
         this.id = id;
@@ -78,22 +92,22 @@ public class Elevator implements Runnable {
      * @param task 待排期任务
      */
     void receive(Task task) {
-        rwLock.readLock().lock();
-        try {
-            if (task != null && !taskQueue.contains(task)) {
-                //接收新任务前重新计算所有任务的优先级
-                updateAllTaskPriorityOnReceive();
-                //当前定好优先级再放入队列
-                doReceive(task);
-                //如果当前任务比电梯正在执行的任务优先级还优先（priority较小，相等都不算），则发生任务抢占
-                if (currTask != null && needGrab(task)) {
-                    LOGGER.trace("{} grab {}", task, currFloor);
-                    currTask.yield();
-                }
+        //updateAllTaskPriorityOnReceive doReceive needGrab 三个方法都需要读取 currFloor 一起做出正确的决策，所以要加读锁保证中间不会有写操作
+        currFloorLock.readLock().lock();
+        if (task != null && !taskQueue.contains(task)) {
+            //接收新任务前重新计算所有任务的优先级
+            updateAllTaskPriorityOnReceive();
+            //当前定好优先级再放入队列
+            doReceive(task);
+            //如果当前任务比电梯正在执行的任务优先级还优先（priority较小，相等都不算），则发生任务抢占
+            currTaskLock.readLock().lock();
+            if (currTask != null && needGrab(task)) {
+                LOGGER.trace("{} grab {}", task, currFloor);
+                currTask.yield();
             }
-        } finally {
-            rwLock.readLock().unlock();
+            currTaskLock.readLock().unlock();
         }
+        currFloorLock.readLock().unlock();
     }
 
     /**
@@ -241,7 +255,9 @@ public class Elevator implements Runnable {
         Set<User> reduceSet = currFloor.reduce(direction, MAX_LOAD - currLoad.size());
         if (!reduceSet.isEmpty()) {
             //电梯增加负载
+            getCurrLoadLock().writeLock().lock();
             currLoad.addAll(reduceSet);
+            getCurrLoadLock().writeLock().unlock();
             LOGGER.info("{} loading {} users: {}", this, reduceSet.size(), reduceSet);
             //每个上电梯的人都按一下想去的楼层
             reduceSet.forEach(user -> {
@@ -258,7 +274,9 @@ public class Elevator implements Runnable {
                 .collect(Collectors.toSet());
         if (unloadSet.size() > 0) {
             //卸载掉
+            getCurrLoadLock().writeLock().lock();
             currLoad.removeAll(unloadSet);
+            getCurrLoadLock().writeLock().unlock();
             LOGGER.info("{} unloading {} users:{}", this, unloadSet.size(), unloadSet);
         }
     }
@@ -325,7 +343,9 @@ public class Elevator implements Runnable {
     }
 
     private void setStatus(ElevatorStatus status) {
+        getStatusLock().writeLock().lock();
         this.status = status;
+        getStatusLock().writeLock().unlock();
     }
 
     public Floor getCurrFloor() {
@@ -333,14 +353,15 @@ public class Elevator implements Runnable {
     }
 
     private void setCurrFloor(Floor currFloor) {
-        //有人读的时候不能写
-        rwLock.writeLock().lock();
+        currFloorLock.writeLock().lock();
         this.currFloor = currFloor;
-        rwLock.writeLock().unlock();
+        currFloorLock.writeLock().unlock();
     }
 
     private void setCurrTask(Task currTask) {
+        currTaskLock.writeLock().lock();
         this.currTask = currTask;
+        currTaskLock.writeLock().unlock();
     }
 
     public void setDispatcher(Dispatcher dispatcher) {
@@ -351,7 +372,16 @@ public class Elevator implements Runnable {
         return currLoad;
     }
 
+    public ReadWriteLock getCurrLoadLock() {
+        return currLoadLock;
+    }
+
+    public ReadWriteLock getStatusLock() {
+        return statusLock;
+    }
+
     @Override
+
     public boolean equals(Object o) {
         if (this == o) {
             return true;

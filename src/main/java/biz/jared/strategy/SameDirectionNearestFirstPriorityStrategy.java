@@ -38,8 +38,9 @@ public class SameDirectionNearestFirstPriorityStrategy implements PriorityCalcul
         int x = task.getSrcFloor().getFloorNo();
         int y = elevator.getCurrFloor().getFloorNo();
         int priority;
+        //elevator.Status can not be changed when this code block is running
+        elevator.getStatusLock().readLock().lock();
         boolean isSameDirection = Calc.isSameDirection(elevator, task);
-
         switch (elevator.getStatus()) {
             case RUNNING_UP:
                 priority = calcPriorityOnRunningUp(x, y, isSameDirection);
@@ -56,6 +57,7 @@ public class SameDirectionNearestFirstPriorityStrategy implements PriorityCalcul
             default:
                 throw new IllegalArgumentException();
         }
+        elevator.getStatusLock().readLock().unlock();
         //priority已经是2倍楼层总数了，优先级要循环
         //        if (priority == MAX_PRIORITY) {
         //            priority = 0;

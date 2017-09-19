@@ -28,9 +28,9 @@ public class Dispatcher {
      */
     private DispatchStrategy dispatchStrategy;
     /**
-     *
+     * 保证 elevatorList 的读写互斥
      */
-    private ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private ReadWriteLock elevatorListLock = new ReentrantReadWriteLock();
     /**
      * 用于异步完成dispatch task
      */
@@ -86,9 +86,9 @@ public class Dispatcher {
      * @param elevator
      */
     void quit(Elevator elevator) {
-        readWriteLock.writeLock().lock();
+        elevatorListLock.writeLock().lock();
         elevatorList.removeIf(e -> e.equals(elevator));
-        readWriteLock.writeLock().unlock();
+        elevatorListLock.writeLock().unlock();
         //无电梯可调度时要shutdown线程池
         if (elevatorList.isEmpty()) {
             executorService.shutdown();
@@ -96,7 +96,7 @@ public class Dispatcher {
         Env.LATCH.countDown();
     }
 
-    public ReadWriteLock getReadWriteLock() {
-        return readWriteLock;
+    public ReadWriteLock getElevatorListLock() {
+        return elevatorListLock;
     }
 }
