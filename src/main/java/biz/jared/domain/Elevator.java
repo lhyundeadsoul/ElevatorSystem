@@ -65,19 +65,19 @@ public class Elevator implements Runnable {
     /**
      * 用于锁楼层（在读取楼层并做任务优先的决策时，不能改楼层数据）
      */
-    private ReadWriteLock currFloorLock = new ReentrantReadWriteLock();
+    private final ReadWriteLock currFloorLock = new ReentrantReadWriteLock();
     /**
      * dispatcher里的线程池要"连续读"currTask这个属性，而电梯线程可以"同时写"currTask这个属性，存在并发错误的可能，且不会引发任何异常，需要加锁
      */
-    private ReadWriteLock currTaskLock = new ReentrantReadWriteLock();
+    private final ReadWriteLock currTaskLock = new ReentrantReadWriteLock();
     /**
      * currLoad属性可能同时在电梯线程里写，在dispatchStrategy-select时读，所以要加锁保护
      */
-    private ReadWriteLock currLoadLock = new ReentrantReadWriteLock();
+    private final ReadWriteLock currLoadLock = new ReentrantReadWriteLock();
     /**
      * status属性可能同时在电梯线程里写，在dispatcher-tryReceive时读，所以要加锁保护
      */
-    private ReadWriteLock statusLock = new ReentrantReadWriteLock();
+    private final ReadWriteLock statusLock = new ReentrantReadWriteLock();
 
     public Elevator(int id, Floor initFloor, PriorityCalculationStrategy priorityCalculationStrategy) {
         this.id = id;
