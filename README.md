@@ -27,20 +27,6 @@ nohup java -jar ~/Sources/ElevatorSystem/target/elevator-system-1.0-SNAPSHOT-jar
 3. support most of operations of elevator e.g. grab/cancel/abandon
 4. support dispatch strategy extensible endpoint
 
-## Legacy Problem
-- [x] 电梯来了，和用户方向不同，用户也不能上
-- [x] dispatcher任务分配优先级还没排查
-- [x] 电梯任务抢占
-- [x] todo
-- [x] UT
-- [x] CI
-- [x] 全部电梯满载时会死循环
-- [x] 加入吞吐、平均等待时间等指标
-- [x] RejectedExecutionException
-- [x] 梳理所有竞争代码块，检查是否有未处理的情况
-- [ ] 尝试设计新的strategy
-- [x] 系统开发中遇到的细节问题总结梳理
-
 ## 遇到的细节问题总结
 ###  整体设计	
 
@@ -81,3 +67,18 @@ nohup java -jar ~/Sources/ElevatorSystem/target/elevator-system-1.0-SNAPSHOT-jar
 ### 任务
 * 任务的方向除了向上走，向下走，还有“到地就停”（Direction.None）
 * 任务被抢占后，要有让出电梯的行为
+
+
+## Legacy Problem
+- [x] 电梯来了，和用户方向不同，用户也不能上
+- [x] dispatcher任务分配优先级还没排查
+- [x] 电梯任务抢占
+- [x] todo
+- [x] UT
+- [x] CI
+- [x] 全部电梯满载时会死循环
+- [x] 加入吞吐、平均等待时间等指标
+- [x] RejectedExecutionException
+- [x] 梳理所有竞争代码块，检查是否有未处理的情况
+- [ ] 尝试设计新的strategy
+- [x] 系统开发中遇到的细节问题总结梳理
