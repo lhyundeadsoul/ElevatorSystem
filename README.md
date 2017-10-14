@@ -32,7 +32,7 @@ nohup java -jar ~/Sources/ElevatorSystem/target/elevator-system-1.0-SNAPSHOT-jar
 - [x] dispatcher任务分配优先级还没排查
 - [x] 电梯任务抢占
 - [x] todo
-- [ ] UT
+- [x] UT
 - [x] CI
 - [x] 全部电梯满载时会死循环
 - [x] 加入吞吐、平均等待时间等指标
