@@ -80,7 +80,7 @@ public class User {
         return name.hashCode();
     }
 
-    public Stopwatch getStopwatch() {
+    Stopwatch getStopwatch() {
         return stopwatch;
     }
 }

@@ -140,7 +140,7 @@ public class Floor {
      *
      * @param direction
      */
-    public void cancel(Direction direction) {
+    void cancel(Direction direction) {
         if (waitingDirectionMap.containsKey(direction)) {
             dispatcher.cancel(waitingDirectionMap.get(direction));
             waitingDirectionMapLock.writeLock().lock();
