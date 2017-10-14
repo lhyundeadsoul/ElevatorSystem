@@ -11,16 +11,17 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DispatcherTest {
     private Dispatcher dispatcher;
     private Elevator e1 = new Elevator(1, new Floor(1), new SameDirectionNearestFirstPriorityStrategy());
     private Elevator e2 = new Elevator(2, new Floor(5), new SameDirectionNearestFirstPriorityStrategy());
+
     @BeforeMethod
-    public void setUp(){
+    public void setUp() {
         DispatchStrategy dispatchStategy = new PriorityFirstDispatchStrategy();
-        List<Elevator> elist = new ArrayList<Elevator>(){
+        List<Elevator> elist = new ArrayList<Elevator>() {
             {
                 add(e1);
                 add(e2);
@@ -34,9 +35,9 @@ public class DispatcherTest {
         dispatcher.dispatch(Task.generate(new Floor(4), Direction.UP));
     }
 
-//    @Test
+    //    @Test
     @Test(dependsOnMethods = "testQuit")
-    public void testQuit2(){
+    public void testQuit2() {
         dispatcher.quit(e1);
         assertThat(Env.LATCH.getCount()).isZero();
     }

@@ -3,7 +3,7 @@ package biz.jared.domain;
 import biz.jared.strategy.SameDirectionNearestFirstPriorityStrategy;
 import org.testng.annotations.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class UserTest {
     User user = new User("lhy", new Floor(11));
@@ -18,7 +18,7 @@ public class UserTest {
         user.enterElevator(elevator);
     }
 
-//    @Test
+    //    @Test
     @Test(dependsOnMethods = "testEnterElevator")
     public void testSelect() throws Exception {
         user.select(new Floor(2));
@@ -26,7 +26,7 @@ public class UserTest {
     }
 
     @Test
-    public void testEquals(){
+    public void testEquals() {
         User lhy = new User("lhy", new Floor(1));
         boolean equals = user.equals(lhy);
         assertThat(equals).isTrue();
