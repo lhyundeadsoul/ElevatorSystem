@@ -20,14 +20,14 @@ public class SameDirectionNearestFirstPriorityStrategy implements PriorityCalcul
      * y = 电梯所处楼层号
      * e = 总楼层数
      * 电梯向上走时的计算逻辑：
-     * 1、同相、顺路 -> p = x - y
-     * 2、同相、不顺路 -> p = 2 * e - y + x
-     * 3、不同相 -> p = 2 * e - x - y
+     * 1、同向、顺路 -> p = x - y
+     * 2、同向、不顺路 -> p = 2 * e - y + x
+     * 3、不同向 -> p = 2 * e - x - y
      * <p>
      * 电梯向下走时的计算逻辑：
-     * 1、同相、顺路 -> p = y - x
-     * 2、同相、不顺路 -> p = 2 * e - x + y
-     * 3、不同相 -> p = x + y
+     * 1、同向、顺路 -> p = y - x
+     * 2、同向、不顺路 -> p = 2 * e - x + y
+     * 3、不同向 -> p = x + y
      *
      * @param elevator 参与计算的电梯
      * @param task     参与计算的任务

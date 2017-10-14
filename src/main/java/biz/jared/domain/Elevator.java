@@ -95,9 +95,9 @@ public class Elevator implements Runnable {
         //updateAllTaskPriorityOnReceive doReceive needGrab 三个方法都需要读取 currFloor 一起做出正确的决策，所以要加读锁保证中间不会有写操作
         currFloorLock.readLock().lock();
         if (task != null && !taskQueue.contains(task)) {
-            //接收新任务前重新计算所有任务的优先级
+            //接收新任务前要刷新所有任务的优先级
             updateAllTaskPriorityOnReceive();
-            //当前定好优先级再放入队列
+            //当前任务定好优先级再放入队列
             doReceive(task);
             //如果当前任务比电梯正在执行的任务优先级还优先（priority较小，相等都不算），则发生任务抢占
             currTaskLock.readLock().lock();
@@ -236,8 +236,6 @@ public class Elevator implements Runnable {
         unload();
         //3. load user who wanna go task's direction
         load(task.getDirection());
-        //4. current floor task has bean done
-        currFloor.done(task.getDirection());
     }
 
     /**
@@ -265,6 +263,8 @@ public class Elevator implements Runnable {
                 user.select(user.getTargetFloor());
             });
         }
+        //任务收尾
+        currFloor.done(direction);
     }
 
     private void unload() {

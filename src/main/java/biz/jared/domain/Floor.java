@@ -54,10 +54,9 @@ public class Floor {
         return Direction.UP.equals(direction) ? nextFloor : preFloor;
     }
 
-    public Floor next(Floor nextFloor) {
+    public void next(Floor nextFloor) {
         this.nextFloor = nextFloor;
         nextFloor.previous(this);
-        return nextFloor;
     }
 
     private void previous(Floor preFloor) {
