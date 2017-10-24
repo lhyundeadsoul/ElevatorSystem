@@ -14,7 +14,7 @@ a Multi-elevator System
 
 # Run it
 ```$xslt
-mvn clean -DskipTests=true package
+mvn clean package
 nohup java -jar ~/Sources/ElevatorSystem/target/elevator-system-1.0-SNAPSHOT-jar-with-dependencies.jar {dispatch-strategy} {priority-strategy} >/dev/null 2>&1 &
 ```
 > dispatch-strategy = RandomDispatch / PriorityFirstDispatch
